@@ -5,8 +5,8 @@
 ;;                  ((((
 ;;                 ((((
 ;;                  ))))             or
-;;               _ .---.               <<<Curry|||lambda(x)t>>>-     
-;;              ( |`---'|                 <<<Howard|||lambda(x)t>>>
+;;               _ .---.                Curry     
+;;              ( |`---'|                    Howard
 ;;               \|     |                       without the fuss
 ;;               : .___, :
 ;;                `-----'  -Karl
@@ -21,14 +21,20 @@
 ;; Here are the primary goals:
 ;;   - a quick startup guide to LaTTe
 ;;   - a pedagogical overview of its main features
-;;   - a first experiment with the main proof rules
+;;   - a first experiment with important proof rules
 ;;
 ;; The main non-goals are:
 ;;   - a complete course about e.g. type theory or logic, or whatever
 ;;   - an exhaustive manual for the proof assistant
+;;   - a maths lecture
 ;;
 ;; So I'll go straight-to-the-point, often omitting (probably) important
-;; aspects
+;; aspects.
+;;
+;; The tutorial is heavily inspired by the talk about LaTTe that I gave
+;; at EuroClojure'2016, cf. https://www.youtube.com/watch?v=5YTCY7wm0Nw
+;; ... note that LaTTe changed a lot since the talk. But it is still an
+;; interesting experience of "live coding mathematics".
 ;;
 ;; Note that this is a *literate programming* document, which means it is
 ;; both a textual document with Clojure (and LaTTe) code examples, and also
@@ -150,14 +156,38 @@
 ;;}
 
 ;;{
+;; # Intended audience
+;;
+;; You might be interested in LaTTe because as a Clojure developer you are curious
+;; about type theory, the lambda-calculus with dependent types, the Curry-Howard correspondance,
+;; or simply formal logic and mathematics.
+;;
+;; You might also be interested in LaTTe to develop some formal mathematical contents, based on
+;; an approach that is not exactly like other proof assistants. I very much welcome mathematical
+;; contributions to the project!
+;;
+;; Finally, you might be intersted in how one may embed a *domain-specific language*, the
+;; Lisp way in Clojure (thus with an extra-layer of data-orientation). Clojure the language
+;; is still there when using Clojure, but you're doing not only programming but also
+;; mathematics and reasoning... The *same* difference, the Lisp way...
+;;
+;; Or maybe you're here and that's it!
+;;
+;; In any case you are very **Welcome**!
+;;
+;;}
+
+;;{
 ;; # Prerequisites
 ;;
 ;; Since LaTTe is a Clojure library, it is required to know at least a bit of
 ;; Clojure and one of its development environment to follow this tutorial.
-;; But beyond basic functional programming principles, there's nothing much to
-;; learn on the Clojure side. This means that if you did not do that already,
-;; you'll have to read the first few chapters of an introductory Clojure book.
-;;
+;; LaTTe works pretty well in Cider or Cursive, or simply with a basic editor
+;; and the REPL.
+
+;; Note that beyond basic functional programming principles, there's nothing much to
+;; learn on the Clojure side. Still, if you don't know Clojure  I can only recommend
+;; to read the first few chapters of an introductory Clojure book.
 ;; I don't want to give any specific recommendation since most of the introductory
 ;; books I've read are quite good ...
 ;;
