@@ -6,7 +6,7 @@ MARKDOWNIZE = $(PYTHON) $(MARKDOWNIZE_PATH)/markdownize.py
 
 MFLAGS = --begin ";;{" --end ";;}" --lang "clojure" --remove-prefix ";;"
 
-OBJS = ch00_front_matter.clj.md
+OBJS = ch00_front_matter.clj.md ch01_first_steps.clj.md
 
 all: markdownize
 

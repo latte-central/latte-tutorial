@@ -12,7 +12,6 @@
 ;;                `-----'  -Karl
 ;;}
 
-
 ;;{
 ;; # About this document
 ;;
