@@ -1,4 +1,8 @@
 
+
+ # Introduction
+
+
 ```clojure
 (ns latte-tutorial.ch00-front-matter)
 
@@ -15,7 +19,7 @@
 
 
 
- # About this document
+ ## About this document
 
  This document is a tutorial introduction to the LaTTe proof assistant.
 
@@ -69,7 +73,7 @@ tested, etc.
 
 
 
- # Author
+ ## Author
 
  I think it is good to introduce oneself when talking to other people.
 
@@ -86,7 +90,7 @@ tested, etc.
 
 
 
- # Acknowledgments
+ ## Acknowledgments
 
  I developed LaTTe after reading (devouring, more so) the following book:
 
@@ -109,7 +113,7 @@ tested, etc.
  the (few) contributors to LaTTE. And of course "big five" to the Clojure core
  dev. team and all the community.
 
- # About LaTTe
+ ## About LaTTe
 
  **LaTTe** stands for "Laboratory for Type Theory Experiments" but it
  is in fact a perfectly usable **proof assistant** for doing formal mathematics
@@ -159,7 +163,7 @@ tested, etc.
 
 
 
- # Intended audience
+ ## Intended audience
 
  You might be interested in LaTTe because as a Clojure developer you are curious
  about type theory, the lambda-calculus with dependent types, the Curry-Howard correspondance,
@@ -181,7 +185,7 @@ tested, etc.
 
 
 
- # Prerequisites
+ ## Prerequisites
 
  Since LaTTe is a Clojure library, it is required to know at least a bit of
  Clojure and one of its development environment to follow this tutorial.
@@ -197,7 +201,7 @@ tested, etc.
 
 
 
- # Tutorial plan
+ ## Tutorial plan
 
  The following steps should be followed in order:
 

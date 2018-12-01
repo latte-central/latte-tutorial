@@ -1,11 +1,11 @@
 
+ # Chapter 1 : first steps
+
+
 ```clojure
 (ns latte-tutorial.ch01-first-steps)
 
-
 ```
-
- # Chapter 1 : first steps
 
  In this short chapter I will quickly explain how to
  install LaTTe and start to work with it.
