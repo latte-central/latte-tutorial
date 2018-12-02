@@ -1,10 +1,10 @@
 
 MARKDOWNIZE_PATH = ../../../markdownize
-PYTHON = python3
+PYTHON = python #3
 
 MARKDOWNIZE = $(PYTHON) $(MARKDOWNIZE_PATH)/markdownize.py
 
-MFLAGS = --begin ";;{" --end ";;}" --lang "clojure" --remove-prefix ";;"
+MFLAGS = --begin ";;{" --end ";;}" --lang "clojure" --remove-prefix ";; "
 
 OBJS = ch00_front_matter.clj.md ch01_first_steps.clj.md ch02_game_rules.clj.md
 
