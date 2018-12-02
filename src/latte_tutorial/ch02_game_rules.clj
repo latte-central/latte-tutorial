@@ -1,7 +1,7 @@
 
 ;;{
 ;; # Chapter 2: The rules of the game
-;;
+;; 
 ;; We are now ready to begin our first mathematical development
 ;; in LaTTe. This will be in a `ch02-game-rules` namespace whose
 ;; declaration is as follows:
@@ -24,19 +24,19 @@
 
 ;;{
 ;; ## Lambda the ultimate
-;;
+;; 
 ;; One assumption I make is that you, the reader, you know the "pure" (i.e. untyped) lambda-calculus.
 ;; This is not a very strong assumption because you can find it right at the core of you favorite
 ;; programming language.  Indeed, in Clojure the `lambda` is called `fn`, which we use to define
 ;; anonymous functions. Note that `fn` corresponds to (the classical) `lambda` only if it accepts
 ;; a single parameter.
-;;
+;; 
 ;; As a trivial example consider the identity function:
-;;
+;; 
 ;; ```clojure
 ;; (fn [x] x)
 ;; ```
-;;
+;; 
 ;; This function can be applied to anything to yield the very *same* anything:
 ;;}
 
@@ -59,7 +59,7 @@
 ;;{
 ;; As a second, slightly more complex example, consider the composition of two functions
 ;; `f` and `g`:
-;;
+;; 
 ;; ```clojure
 ;; (fn [f] (fn [g] (fn [x] (g (f x)))))
 ;; ```
@@ -104,7 +104,7 @@
 
 ;;{
 ;; ## Types, really ?
-;;
+;; 
 ;; ```
 ;;                _..._
 ;;              .'     '.
@@ -147,16 +147,16 @@
 ;; not use Clojure for starters), I am totally sold to the use of types in logic
 ;; and mathematics. I find much more interested in having a "set of integers" rather
 ;; than a "set" without further mentioning of the type of things I'll find as elements.
-;;
+;; 
 ;; So if we want to define e.g. the identity function not directly in Clojure but
 ;; this time in LaTTe (which is also Clojure by the way), we will have to add some type annotations.
-;;
+;; 
 ;; In LaTTe, `lambda` is called `lambda`, or `λ`, rather than `fn`. In this part of the tutorial
 ;; we will rather use the beautiful `λ` rather than its ascii spelling. This is to emphasis
 ;; that we are not yet at the user-level of the proof assistant, we only play with its λ-calculus kernel.
-;;
+;; 
 ;; Thus our starting point is this:
-;;
+;; 
 ;; ```clojure
 ;; ;; The identity function in latte (initial version)
 ;; (term
@@ -174,7 +174,7 @@
 ;; and returns the internal representation of the term as Clojure data.
 ;; As the exception raised by LaTTe makes clear, there is something missing in our identity function.
 ;; In fact we need to give an explicit type to the variable `x`, let's try with an arbitrary type named `A`:
-;;
+;; 
 ;; ```clojure
 ;; (term
 ;;  (λ [x A] x))
@@ -193,7 +193,7 @@
 ;; which is rather a good thing when debugging mathematics!
 ;; Here we have a type error, and the ultimate reason is that
 ;; the variable `A` is defined nowhere.
-;;
+;; 
 ;; What we would like is to make `A` an arbitrary type, so for
 ;; this we will add an extra layer of abstraction to our λ.
 ;;}
@@ -207,7 +207,7 @@
 ;; Hence in LaTTe the (type-)generic identity function first takes an arbitrary type
 ;; `A` as a first argument, and returns a function that takes an arbibrary `x` of type
 ;; `A` to finally return `x` itself. That's generic as it can be!
-;;
+;; 
 ;; The value returned by the `term` form (technically a Clojure macro) is the internal
 ;; representation of the terms in LaTTe. It's almost like what is written except that
 ;; the type of types is written `✳` internally.
