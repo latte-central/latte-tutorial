@@ -145,7 +145,7 @@
 ;; an essential part of the mathematical language. As I often say if I am not
 ;; totally sold to the use of (static) types in programming (otherwise I would maybe
 ;; not use Clojure for starters), I am totally sold to the use of types in logic
-;; and mathematics. I find much more interested in having a "set of integers" rather
+;; and mathematics. I find much more interests in having a "set of integers" rather
 ;; than a "set" without further mentioning of the type of things I'll find as elements.
 ;; 
 ;; So if we want to define e.g. the identity function not directly in Clojure but
