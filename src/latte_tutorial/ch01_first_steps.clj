@@ -93,8 +93,8 @@
 ;; we simply have to create a namespace source file with the `.clj` extension
 ;; and start coding.
 ;; 
-;; We will proceed to the file `src.latte_tutorial.ch03_game_rules.clj` corresponding
-;; to the namespace `latte-tutorial.ch03-game-rules` in which we'll start coding
+;; We will proceed to the file `src.latte_tutorial.ch02_game_rules.clj` corresponding
+;; to the namespace `latte-tutorial.ch02-game-rules` in which we'll start coding
 ;; mathematics.
 ;; 
 ;; Please proceed ...
