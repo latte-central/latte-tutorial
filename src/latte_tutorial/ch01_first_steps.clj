@@ -17,16 +17,16 @@
 ;; but I am personally enjoying working with leiningen and
 ;; find it also a fantastic build tool for mathematical
 ;; developments !
-;;
+;; 
 ;;}
 
 ;;{
 ;; ## Step 1: the project structure
-;;
+;; 
 ;; I will take the current `latte-tutorial` project as an example.
 ;; I have created the basic directory structure with leiningen, using
 ;; something like the following:
-;;
+;; 
 ;; ```
 ;; $ lein new app latte-tutorial
 ;; ```

@@ -19,16 +19,16 @@ Other build tools, such as boot or deps, could be used
 but I am personally enjoying working with leiningen and
 find it also a fantastic build tool for mathematical
 developments !
-;;
+
 
 
 
 ## Step 1: the project structure
-;;
+
 I will take the current `latte-tutorial` project as an example.
 I have created the basic directory structure with leiningen, using
 something like the following:
-;;
+
 ```
 $ lein new app latte-tutorial
 ```
@@ -95,8 +95,8 @@ In this final step, we begin our work with LaTTe. As for any Clojure program
 we simply have to create a namespace source file with the `.clj` extension
 and start coding.
 
-We will proceed to the file `src.latte_tutorial.ch03_game_rules.clj` corresponding
-to the namespace `latte-tutorial.ch03-game-rules` in which we'll start coding
+We will proceed to the file `src.latte_tutorial.ch02_game_rules.clj` corresponding
+to the namespace `latte-tutorial.ch02-game-rules` in which we'll start coding
 mathematics.
 
 Please proceed ...

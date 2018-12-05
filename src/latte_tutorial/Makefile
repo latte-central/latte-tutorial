@@ -1,6 +1,6 @@
 
 MARKDOWNIZE_PATH = ../../../markdownize
-PYTHON = python #3
+PYTHON = python3
 
 MARKDOWNIZE = $(PYTHON) $(MARKDOWNIZE_PATH)/markdownize.py
 

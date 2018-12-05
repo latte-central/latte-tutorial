@@ -140,7 +140,7 @@
 ;; In the composition example above we did something rather unusual in Clojure:
 ;; we described the type of functions using the notation `(==> T U)` with `T` the
 ;; type of the input, and `U` the type of the returned value.
-;;
+;; 
 ;; As we'll quickly see, in a type theory the explicit mentioning of type becomes
 ;; an essential part of the mathematical language. As I often say if I am not
 ;; totally sold to the use of (static) types in programming (otherwise I would maybe
