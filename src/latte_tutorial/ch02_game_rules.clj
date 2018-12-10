@@ -21,7 +21,7 @@
 
 ;;{
 ;; ## Lambda the ultimate
-;; 
+;;
 ;; One assumption I make is that you, the reader, you know the "pure" (i.e. untyped) lambda-calculus.
 ;; This is not a very strong assumption because you can find it right at the core of you favorite
 ;; programming language.  Indeed, in Clojure the `lambda` is called `fn`, which we use to define

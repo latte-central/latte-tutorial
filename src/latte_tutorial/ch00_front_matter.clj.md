@@ -8,14 +8,14 @@
 
 ```
 
-                 ((((
-                ((((
-                 ))))             or
-              _ .---.                Curry     
-             ( |`---'|                    Howard
-              \|     |                       without the fuss
-              : .___, :
-               `-----'  -Karl
+((((
+((((
+))))             or
+_ .---.                Curry     
+( |`---'|                    Howard
+\|     |                       without the fuss
+: .___, :
+`-----'  -Karl
 
 
 
@@ -24,14 +24,14 @@
 This document is a tutorial introduction to the LaTTe proof assistant.
 
 Here are the primary goals:
-  - a quick startup guide to LaTTe
-  - a pedagogical overview of its main features
-  - a first experiment with important proof rules
+- a quick startup guide to LaTTe
+- a pedagogical overview of its main features
+- a first experiment with important proof rules
 
 The main non-goals are:
-  - a complete course about e.g. type theory or logic, or whatever
-  - an exhaustive manual for the proof assistant
-  - a maths lecture
+- a complete course about e.g. type theory or logic, or whatever
+- an exhaustive manual for the proof assistant
+- a maths lecture
 
 So I'll go straight-to-the-point, often omitting (probably) important
 aspects.
@@ -47,10 +47,10 @@ a set of heavy commented Clojure source files that can be compiled, executed,
 tested, etc.
 
 For each namespace `nsp` (in the Clojure terminology), you'll find :
- - one file `nsp.clj` containing the Clojure **code source view** with all the explanations
-   (e.g. this very sentence) as comments
- - a corresponding file `nsp.clj.md` containing the **document view** as a markdown
-   text with all the source code.
+- one file `nsp.clj` containing the Clojure **code source view** with all the explanations
+(e.g. this very sentence) as comments
+- a corresponding file `nsp.clj.md` containing the **document view** as a markdown
+text with all the source code.
 
 For example, the following line is an expression of the Clojure language that
 can be evaluated directly when loading the code source view
@@ -69,7 +69,7 @@ by a very simple *Markownize* tool that you can find at: https://github.com/fred
 
 Also, there are a few exercises and questions in the `master` branch of the tutorial.
 The solutions are available in the `solution' branch (which should be at least one commit beyond `master`).
- 
+
 
 
 
@@ -98,13 +98,13 @@ I developed LaTTe after reading (devouring, more so) the following book:
 - Rob Nederpelt and Herman Geuvers
 - Cambridge University Press, 2012
 
-              __...--~~~~~-._   _.-~~~~~--...__
-            //               `V'               \\ 
-           //                 |                 \\ 
-          //__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
-         //__.....----~~~~._\ | /_.~~~~----.....__\\
-        ====================\\|//====================
-                        dwb `---`  
+__...--~~~~~-._   _.-~~~~~--...__
+//               `V'               \\ 
+//                 |                 \\ 
+//__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
+//__.....----~~~~._\ | /_.~~~~----.....__\\
+====================\\|//====================
+dwb `---`  
 
 That's a heavily recommended lecture, but it's not a prerequisite
 for learning and using LaTTe (only a very nice complement).
@@ -126,9 +126,9 @@ constructors of the type theory used by LaTTe, a very simple dependently typed
 lambda-calculus. This will be explained, at least superficially, in the tutorial.
 
 The basic activity of a proof assistant user is to:
- - write **definitions** of mathematical concepts (e.g. what it is to be a bijection)
- - state properties about these concepts based on their definitions, in the form of **axioms** and (yet unproven) **theorems** (or lemmas)
- - and for each theorem, help in writing a **formal proof** that it indeed holds
+- write **definitions** of mathematical concepts (e.g. what it is to be a bijection)
+- state properties about these concepts based on their definitions, in the form of **axioms** and (yet unproven) **theorems** (or lemmas)
+- and for each theorem, help in writing a **formal proof** that it indeed holds
 
 So it's of no surprise that these are the main features of LaTTe.
 But it is also a library for the Clojure programming language, which is unlike

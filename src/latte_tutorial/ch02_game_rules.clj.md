@@ -115,33 +115,33 @@ to begin exploring the LaTTe features.
 ## Types, really ?
 
 ```
-               _..._
-             .'     '.
-            /`\     /`\    |\         But ...
-           (__|     |__)|\  \\  /|
-           (     "     ) \\ || //
-            \         /   \\||//            Wait !?!
-             \   _   /  |\|`  /
-              '.___.'   \____/
-               (___)    (___)
-             /`     `\  / /
-            |         \/ /
-            | |     |\  /
-            | |     | "`
-            | |     |
-            | |     |
-            |_|_____|
-           (___)_____)
-           /    \   |
-          /   |\|   |
-         //||\\  Y  |
-        || || \\ |  |
-        |/ \\ |\||  |
-            \||__|__|
-             (___|___)
-        jgs  /   A   \
-            /   / \   \
-           \___/   \___/
+_..._
+.'     '.
+/`\     /`\    |\         But ...
+(__|     |__)|\  \\  /|
+(     "     ) \\ || //
+\         /   \\||//            Wait !?!
+\   _   /  |\|`  /
+'.___.'   \____/
+(___)    (___)
+/`     `\  / /
+|         \/ /
+| |     |\  /
+| |     | "`
+| |     |
+| |     |
+|_|_____|
+(___)_____)
+/    \   |
+/   |\|   |
+//||\\  Y  |
+|| || \\ |  |
+|/ \\ |\||  |
+\||__|__|
+(___|___)
+jgs  /   A   \
+/   / \   \
+\___/   \___/
 ```
 
 
@@ -169,12 +169,12 @@ Thus our starting point is this:
 ```clojure
 ;; The identity function in latte (initial version)
 (term
-  (λ [x] x))
- --> Unhandled clojure.lang.ExceptionInfo
-     Parse error
-     {:msg "Wrong bindings in λ form",
-      :term (λ [x] x),
-      :from {:msg "Binding must have at least 2 elements", :term [x]}}
+(λ [x] x))
+--> Unhandled clojure.lang.ExceptionInfo
+Parse error
+{:msg "Wrong bindings in λ form",
+:term (λ [x] x),
+:from {:msg "Binding must have at least 2 elements", :term [x]}}
 ```
 
 
@@ -186,14 +186,14 @@ In fact we need to give an explicit type to the variable `x`, let's try with an 
 
 ```clojure
 (term
- (λ [x A] x))
- --> Unhandled clojure.lang.ExceptionInfo
-     Type checking error
-     {:msg "Cannot calculate codomain type of abstraction.",
-      :term (λ [x A] x),
-      :from {:msg "Cannot calculate type of variable.",
-      :term x,
-      :from {:msg "No such variable in type context", :term A}}}      
+(λ [x A] x))
+--> Unhandled clojure.lang.ExceptionInfo
+Type checking error
+{:msg "Cannot calculate codomain type of abstraction.",
+:term (λ [x A] x),
+:from {:msg "Cannot calculate type of variable.",
+:term x,
+:from {:msg "No such variable in type context", :term A}}}      
 ```
 
 
