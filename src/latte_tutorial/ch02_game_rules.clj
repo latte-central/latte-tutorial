@@ -410,7 +410,7 @@
 ;;{
 ;; **Remark**: the so-called "telescoped" notation `(λ [A B C :type] ...)`
 ;; is the same as `(λ [A :type] (λ [B :type] (λ [C :type] ...)`
-;; This is a common and useful notational facility (internall lambda's have only one argument).
+;; This is a common and useful notational facility (internal lambda's have only one argument).
 ;; 
 ;; **Question**:
 ;; - write the type of the term above  (the telescope notation is also avaiable
@@ -520,21 +520,209 @@
 ;;}
 
 ;;{
-;; ## Deduction with application
+;; ## Curry Howard Part Two: Programs as Proofs
 ;; 
-;; (TODO)
+;; We are now ready for the Curry Howard enlightenment, take two.
+;;
+;; With what we learn in the previous sections, we are now able to build implications
+;; and universal quantifications using lambda's, but we are missing one important piece
+;; of the puzzle: a way to *use* an implication or universal quantification to perform a *deduction*.
+;;
+;; In the so-called *natural deduction*, an inference rule called the *modus ponens* explains
+;; how an implication can be used in a reasoning step. In plain english, the rule states:
+;;
+;; > If we know that "A implies B", and if moreover "A holds".
+;; > Then we can deduce that "B holds" too.
+;;
+;; This proposition, which is undoubtedly among the most important rules of logic, can be rephased as a type:
+;;
+;; ```clojure
+;; (==> (==> A B) A
+;;      B)
+;; ```
+;;
+;; Note that the outermost implication is used here as a kind of "trailed" conjunction: if we *first*
+;; have `(==> A B)` and *then* we have `A`, then we can deduce `B`.
+;;
+;; In the next chapter we will define the more traditional conjunction (`and`) operator, but in type theory
+;; the "trailed" implication is used most of the time since it is primitive.
+;;
+;; According to natural deduction (and logical reasoning indeed), the proposition above should be *true*.
+;; This could be a basic law of our logic, which would make the proposition true *philosophically*.
+;; But if philosophical truth is OK, mathematical proof is best!
+;;
+;; The question thus becomes: *what is a proof?*
+;; If in philosophy and "everyday" mathematics this question can bring us quite far, once again type theory
+;; offers a very simple and "natural" answer: a *proof* is simply a *program* expressed as a lambda-term.
+;; This is the programs-as-proofs part of the Curry-Howard correspondance.
+;;
+;; In LaTTe, this means that in order to prove a proposition $P$, we have to find a term $t$ whose type
+;; is $P$. Note that we are not trying to find a particular program/term $t$ but *any* term $t$ whose type
+;; is $P$ will do. This notion of *proof irrelevance* makes proving with programs slightly different from
+;; programming *per se*. However some proofs are more elegant than others, more efficient (i.e. smaller) than
+;; others, etc. So this is not totally unlike programming when before reaching for an efficient solution,
+;; one often begins with a naive solution.
+;;
+;; Going back to our *modus ponens* proposition, we are thus trying to fill the star symbol below with:
+;; an adequate term:
 ;;}
 
-;;{
-;; ## Curry Howard Part Two: Proofs as Programs
-;; 
-;;}
+(type-check?
+ [A :type] [B :type]
+ ;; find a term ...
+ ✳
+ ;; of type
+ (==> (==> A B) A
+      B))
+;; => false  (for the moment)
 
 ;;{
-;; ## Universal quantification, silogistically
-;; 
-;; (TODO)
+;; To avoid having to many nested lambda's, we introduce a *context*  (akin to a lexical environment
+;; in programming terms) composed of two arbitrary variables: `A` and `B` both of type `types`, hence
+;; arbitrary propositions/types. We could have introduced then using universal quantifiers but we would
+;; have lost the core of what we want to prove. Similarly in Clojure we write:
+;;
+;; ```clojure
+;; (defn myfun [A B] ...)
+;; ```
+;; rather than:
+;; ```clojure
+;; (def myfun (fn [A] (fn [B] ...)))
+;; ```
+;;
+;; It is a good exercise to make the `type-check?' form above returns `true` but it is our first formal proof so let's
+;; do it together.
+;;
+;; We know by now (it's in our knowhow) that an implication is build using a lambda abstraction, i.e.:
+;;
+;; > a type of the form `(==> X Y)` is built using a term of the form `(λ [v X] e)`
+;; > with  `e` a term of type `Y`,  which in most cases must use the variable `v` declared of type `X`.
+;;
+;; Our implication has three members so this becomes:
+;;
+;; > a type of the form `(==> X Y Z)` is built using a term of the form `(λ [v X] (λ [w Y] e))`
+;; > with  `e` a term of type `Z`, using the variable `v` declared of type `X`, and `w` of type `Y`.
+;;
+;; The inner implication `(==> A B)` resembles a *function type*: a function from type `A` to type `B`.
+;; Let's called this function `f`. And then we have a variable of type `A`: let's call it `x`.
+;; Hence we could use something of the form:
+;;
+;; ```clojure
+;; (λ [f (==> A B)]
+;;   (λ [x A]
+;;       ? ;; should be of type B
+;; ))
+;; ```
+;; Let's think in terms of programs now. We have a function `f` from `A` to `B` and a variable `x` of type A`.
+;; Applying `f` to `x`, hence `(f x)`, should produce a value of type `B`, exactly what we need.
+;; Let's try this!
 ;;}
+
+(type-check?
+ [A :type] [B :type]
+ ;; is the term ...
+ (λ [f (==> A B)]
+    (λ [x A]
+       (f x)))
+ ;; of type
+ (==> (==> A B) A
+      B) ;; ?
+ )
+;; => true  (it works!)
+
+;;{
+;; We just wrote a formal proof of the *modus ponens*, and it was like a very
+;; basic typed functional program!
+;;
+;; An very important take away is the tight relation between:
+;; - *computation* with function application on the one side, and
+;; - *logic* on the other side, with *modus ponens* a.k.a. deduction.
+;;
+;;}
+
+
+;;{
+;; ## Universal quantification
+;; 
+;; In type theory, implication is a special case of universal quantification,
+;; both are introduced by lambda's. So it is not a surprise that using a
+;; universally quantified proposition is *also* related to function application.
+;;
+;; To demonstrate this, we will take a typical example from the logic curriculum:
+;;
+;; > All mens are mortal.
+;; > Socrates is a man.
+;; > Hence Socrates is mortal.
+;;
+;; This is a *syllogism* attributed to Aristotle. We are very far from modern
+;; logic but at least we can use this to illustrate the instantiation of
+;; universal quantification: the particular Socrates is an instantiation of "all men".
+;;
+;; We can translate the proposition in LaTTe, e.g. as follows:
+;;
+;;}
+
+(type-check?
+ [Thing :type] [man (==> Thing :type)] [mortal (==> Thing :type)]
+ [socrates Thing]
+ ;; we want to replace the following by a term ...
+ ✳
+ ;; of type
+ (==> (∀ [t Thing]
+       (==> (man t) (mortal t))) ;; all men are mortal
+      (man socrates)  ;; socrates is a man
+      ;; thus
+      (mortal socrates))) ;; socrates is mortal
+;; => false  (for now ...)
+
+;;{
+;; Once again we have an implication hence the term we are looking for is
+;; of the form:
+;;
+;; ```clojure
+;; (λ [H1 (∀ [t Thing]
+;;          (==> (man t) (mortal t)))]
+;;   (λ [H2 (man socrates)]
+;;      ?  ;; should be a term of type  (mortal socrates)
+;; ))
+;; ```
+;; In the first step, we can build a term of type `(==> (man socrates) (mortal socrates))`
+;; by instantiating the universal quantification on "all things" using the particular
+;; `socrates`, hence the term: `(H1 socrates)`. Our "puzzle" then becomes:
+;;
+;; ```clojure
+;; (λ [H1 (∀ [t Thing]
+;;          (==> (man t) (mortal t)))]
+;;   (λ [H2 (man socrates)]
+;;      ((H1 socrates)
+         ?  ;; should be a term of type  (man socrates)
+;; )))
+;; ```
+;; The term `H2` has exactly the required type, hence in the final step we have:
+;;}
+
+(type-check?
+ [Thing :type] [man (==> Thing :type)] [mortal (==> Thing :type)]
+ [socrates Thing]
+ ;; the term ...
+ (λ [H1 (∀ [t Thing]
+         (==> (man t) (mortal t)))]
+    (λ [H2 (man socrates)]
+       ((H1 socrates)
+         H2)))
+ ;; is of type
+ (==> (∀ [t Thing]
+       (==> (man t) (mortal t)))
+      (man socrates)
+      (mortal socrates)))
+;; => true  (yes!)
+
+;;{
+;; We thus wrote a formal proof that Aristotle's syllogism is indeed a
+;; theorem in type theory and LaTTe.
+;;
+;;}
+
 ;;{
 ;; ## The rules of the game, in summary
 ;; 
@@ -545,5 +733,9 @@
 ;; 5. programs are proofs (a.k.a. Curry Howard part two)
 ;; 6. the type of `:type` is the sort `:kind`, and kind is the only term without a type 
 ;; 
-;; Now that we know the rules, let's put them into practice.
+;; These are the basic rules, but we are still far from being able to do actual
+;; mathematical developments using only these basic rules. Indeed, directly writing lamda-terms
+;; to prove mathematical statements quickly becomes cumbersome and too far away from the
+;; way proofs are generally expressed in mathematics. Moreover, we need higher level
+;; abstractions, so in the next chapter we will meet the actual LaTTe proof assistant.
 ;;}
