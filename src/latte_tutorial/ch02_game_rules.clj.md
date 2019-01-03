@@ -23,7 +23,7 @@ thing. It means that the requirements are satisfied.
 
 
 ## Lambda the ultimate
-
+;;
 One assumption I make is that you, the reader, you know the "pure" (i.e. untyped) lambda-calculus.
 This is not a very strong assumption because you can find it right at the core of you favorite
 programming language.  Indeed, in Clojure the `lambda` is called `fn`, which we use to define
@@ -137,12 +137,12 @@ Thus our starting point is this:
 ```clojure
 ;; The identity function in latte (initial version)
 (term
-(λ [x] x))
---> Unhandled clojure.lang.ExceptionInfo
-Parse error
-{:msg "Wrong bindings in λ form",
-:term (λ [x] x),
-:from {:msg "Binding must have at least 2 elements", :term [x]}}
+  (λ [x] x))
+ --> Unhandled clojure.lang.ExceptionInfo
+     Parse error
+     {:msg "Wrong bindings in λ form",
+      :term (λ [x] x),
+      :from {:msg "Binding must have at least 2 elements", :term [x]}}
 ```
 
 
@@ -154,14 +154,14 @@ In fact we need to give an explicit type to the variable `x`, let's try with an 
 
 ```clojure
 (term
-(λ [x A] x))
---> Unhandled clojure.lang.ExceptionInfo
-Type checking error
-{:msg "Cannot calculate codomain type of abstraction.",
-:term (λ [x A] x),
-:from {:msg "Cannot calculate type of variable.",
-:term x,
-:from {:msg "No such variable in type context", :term A}}}      
+ (λ [x A] x))
+ --> Unhandled clojure.lang.ExceptionInfo
+     Type checking error
+     {:msg "Cannot calculate codomain type of abstraction.",
+      :term (λ [x A] x),
+      :from {:msg "Cannot calculate type of variable.",
+      :term x,
+      :from {:msg "No such variable in type context", :term A}}}      
 ```
 
 
@@ -540,7 +540,7 @@ This proposition, which is undoubtedly among the most important rules of logic, 
 
 ```clojure
 (==> (==> A B) A
-B)
+     B)
 ```
 
 Note that the outermost implication is used here as a kind of "trailed" conjunction: if we *first*
@@ -613,8 +613,8 @@ Hence we could use something of the form:
 
 ```clojure
 (λ [f (==> A B)]
-(λ [x A]
-? ;; should be of type B
+  (λ [x A]
+      ? ;; should be of type B
 ))
 ```
 Let's think in terms of programs now. We have a function `f` from `A` to `B` and a variable `x` of type A`.
@@ -689,9 +689,9 @@ of the form:
 
 ```clojure
 (λ [H1 (∀ [t Thing]
-(==> (man t) (mortal t)))]
-(λ [H2 (man socrates)]
-?  ;; should be a term of type  (mortal socrates)
+         (==> (man t) (mortal t)))]
+  (λ [H2 (man socrates)]
+     ?  ;; should be a term of type  (mortal socrates)
 ))
 ```
 In the first step, we can build a term of type `(==> (man socrates) (mortal socrates))`
@@ -700,9 +700,9 @@ by instantiating the universal quantification on "all things" using the particul
 
 ```clojure
 (λ [H1 (∀ [t Thing]
-(==> (man t) (mortal t)))]
-(λ [H2 (man socrates)]
-((H1 socrates)
+         (==> (man t) (mortal t)))]
+  (λ [H2 (man socrates)]
+     ((H1 socrates)
          ?  ;; should be a term of type  (man socrates)
 )))
 ```
