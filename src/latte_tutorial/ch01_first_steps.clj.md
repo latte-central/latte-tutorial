@@ -60,11 +60,11 @@ informations:
   :url "https://github.com/latte-central/latte-tutorial"
   :license {:name "MIT License"
             :url "http://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.9.0"]
-                 [latte "1.0"]
-                 [latte-prelude "1.0"]
-                 [latte-sets "1.0"]
-                 [latte-integers "1.0"]])
+  :dependencies [[org.clojure/clojure "1.10.0"]
+                 [latte "1.0b2"]
+                 [latte-prelude "1.0b2"]
+                 [latte-sets "1.0b2"]
+                 [latte-integers "1.0b2"]])
 ```
 The `:dependencies` key is most interesting.
 We first require the Clojure implementation itself, of course.
