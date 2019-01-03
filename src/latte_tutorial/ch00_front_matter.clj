@@ -77,17 +77,9 @@
 ;; 
 ;; I developed LaTTe after reading (devouring, more so) the following book:
 ;; 
-;; **Type Theory and Formal Proof: an Introduction**
-;; - Rob Nederpelt and Herman Geuvers
-;; - Cambridge University Press, 2012
-;; 
-;;               __...--~~~~~-._   _.-~~~~~--...__
-;;             //               `V'               \\ 
-;;            //                 |                 \\ 
-;;           //__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
-;;          //__.....----~~~~._\ | /_.~~~~----.....__\\
-;;         ====================\\|//====================
-;;                         dwb `---`  
+;; > **Type Theory and Formal Proof: an Introduction**
+;; > Rob Nederpelt and Herman Geuvers
+;; > Cambridge University Press, 2012
 ;; 
 ;; That's a heavily recommended lecture, but it's not a prerequisite
 ;; for learning and using LaTTe (only a very nice complement).
