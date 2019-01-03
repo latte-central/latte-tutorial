@@ -8,19 +8,6 @@
 
 ```
 
-((((
-((((
-))))             or
-_ .---.                Curry     
-( |`---'|                    Howard
-\|     |                       without the fuss
-: .___, :
-`-----'  -Karl
-
-
-
-## About this document
-
 This document is a tutorial introduction to the LaTTe proof assistant.
 
 Here are the primary goals:

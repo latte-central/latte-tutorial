@@ -102,38 +102,6 @@
 ;;{
 ;; ## Types, really ?
 ;; 
-;; ```
-;;                _..._
-;;              .'     '.
-;;             /`\     /`\    |\         But ...
-;;            (__|     |__)|\  \\  /|
-;;            (     "     ) \\ || //
-;;             \         /   \\||//            Wait !?!
-;;              \   _   /  |\|`  /
-;;               '.___.'   \____/
-;;                (___)    (___)
-;;              /`     `\  / /
-;;             |         \/ /
-;;             | |     |\  /
-;;             | |     | "`
-;;             | |     |
-;;             | |     |
-;;             |_|_____|
-;;            (___)_____)
-;;            /    \   |
-;;           /   |\|   |
-;;          //||\\  Y  |
-;;         || || \\ |  |
-;;         |/ \\ |\||  |
-;;             \||__|__|
-;;              (___|___)
-;;         jgs  /   A   \
-;;             /   / \   \
-;;            \___/   \___/
-;; ```
-;;}
-
-;;{
 ;; In the composition example above we did something rather unusual in Clojure:
 ;; we described the type of functions using the notation `(==> T U)` with `T` the
 ;; type of the input, and `U` the type of the returned value.
