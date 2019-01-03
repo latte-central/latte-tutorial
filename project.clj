@@ -7,5 +7,6 @@
                  [latte "1.0b2-SNAPSHOT"]
                  [latte-prelude "1.0b2-SNAPSHOT"]
                  [latte-sets "1.0b2-SNAPSHOT"]
-                 [latte-integers "1.0b2-SNAPSHOT"]])
+                 [latte-integers "1.0b2-SNAPSHOT"]]
+  :plugins [[cider/cider-nrepl "0.20.0-SNAPSHOT"]])
 
