@@ -11,7 +11,8 @@ do some actual logic.
 (ns latte-tutorial.ch03-logic-bits
   ;; In this namespace we will start to use LaTTe "for real",
   ;; so we introduce the main forms from the core namespace
-  (:require [latte.core :as latte :refer [definition defthm try-example proof try-proof
+  (:require [latte.core :as latte :refer [definition defthm deflemma example try-example
+                                          proof try-proof
                                           assume have qed]]
             ;; we will also exploit the basic proposition from the prelude
             [latte-prelude.prop :as p :refer [and or not]])
@@ -21,7 +22,7 @@ do some actual logic.
 
 ```
 
-;;*Natural deduction* is a way of presenting and formalizing logics
+*Natural deduction* is a way of presenting and formalizing logics
 based on:
 - introduction rules, or how to construct logical statements
 - elimination rules, or how to take them apart.
@@ -57,20 +58,73 @@ The definition is provided in the prelude:
            (==> (==> A B C)
                 C)))
 ```
+But we will write our own version so that we can "play" with it
+(the one defined in the prelude is declared *opaque* which means
+the definition is hidden from the user).
 
-This is called the "second order characterization
-of conjunction". While this can be interpreted as a
+
+```clojure
+(definition my-and
+  "logical conjunction, a remake"
+  [[A :type] [B :type]]
+  (forall [C :type]
+          (==> (==> A B C)
+               C)))
+;; => [:defined :term my-and]
+
+```
+
+A mathematical definition in LaTTe is of the form:
+
+```clojure
+(definition <name>
+   "<docstring>"
+   [[x1 T1] ... [xN TN]] ;; <parameters>
+   <body-type>)
+```
+
+
+The `<body>` of the definition is a type, hence a term of type `:type` that
+is parameterized.
+Such a definition is also a `def` in the Clojure sense, it has e.g. a
+documentation:
+
+
+
+(use 'clojure.repl)
+
+(doc my-and)
+;;{
+latte-tutorial.ch03-logic-bits/my-and
+([[A :type] [B :type]])
+  
+```
+(forall [C :type] (==> (==> A B C) C))
+```
+**Definition**: logical conjunction, a remake.
+
+
+
+We will see many definitions in this tutorials, so let's
+go back to what is called the "second order characterization
+of conjunction" (originating from *System F*).
+While this can be interpreted as a
 generic proof scheme based on the knowledge of two
 propositions `A` and `B`, in natural deduction we
 prefer to decompose the scheme in two parts: the
 introduction of a conjunction, or its eliminations.
+
+
+### Introduction rule
+
+
 Informally, the introduction rule for conjunction
 is often presented as follows:
 
 ```
    A     B
-=============
- (and A B)
+============= (and-intro)
+  (and A B)
 ```
 
 The horizontal "double bar" means implication, thus this reads as follows:
@@ -89,7 +143,7 @@ can formalize the introduction rule in LaTTe:
   "Introduction rule for conjunction."
   [[A :type] [B :type]]
   (==> A B
-       (and A B)))
+       (my-and A B)))
 ;; => [:declared :theorem my-and-intro]
 
 ```
@@ -111,7 +165,7 @@ my-and-intro
 ;;       :arity 2,
 ;;       :type (Π [⇧ A]
 ;;                (Π [⇧ B]
-;;                   (#'latte-prelude.prop/and A B))),
+;;                   (#'latte-tutorial.ch03-logic-bits/my-and A B))),
 ;;       :proof nil}
 
 ```
@@ -124,11 +178,558 @@ the theorem somehow.
 
 ```clojure
 (try-example [[A :type]]
-    (==> A A (and A A))
+    (==> A A (my-and A A))
   (qed (my-and-intro A A)))
 ;; = > [:failed "Proof failed: Qed step failed: cannot infer term type."
 ;;              {:cause {:msg "Theorem has no proof.",
 ;;                       :thm-name my-and-intro},
-;;               :meta {:line 3, :column 3}}]
+;;               :meta {:line 165, :column 3}}]
+
 
 ```
+
+The `try-example' form let us state propositions together with
+their proof. It is like a theorem that we do not plan to save for further
+use. In real developments, the use of the `example` variant is recommended
+since it will throw an exception in case of a problem, hence it is a
+nice utility for both documenting by example as well as self-testing.
+We will go back to the way the proofs are written at a later stage,
+so let's just observe that using a theorem without a proof is forbidden
+in LaTTe (or at least it should be, cf. https://github.com/latte-central/latte-kernel/commit/0ae1f187de15d60ff0376520575e9bdf9a68e21c).
+
+
+
+Thus we have to write a formal proof that `my-and-intro` really is a theorem.
+There are two options in LaTTe to do so:
+
+ 1. we can write a proof term, using the proof-as-program side of the Curry-Howard correspondance, like we did previously
+ 2. or we can write a declarative proof following the natural deduction style.
+
+We already know how to write a proof term, so let's first demonstrate the first possibility.
+To prove a theorem in LaTTe, we have to use the `proof` function (it is not a macro because it doesn't have to be), which expects arguments of the following form:
+
+
+```clojure
+(proof '<theorem-name>
+   <proof-script>)
+;;```
+
+
+The `<proof-script>` part is based on a very reduced set of constructions, the simplest one
+being `(qed <proof-term>)` when we want to conclude the proof using a proof term.
+Here is an example of a direct demonstration using `qed`:
+
+
+```clojure
+(proof 'my-and-intro
+  (qed (λ [x A]
+          (λ [y B]
+             (λ [C :type]
+                (λ [z (==> A B C)]
+                   ((z x) y)))))))
+;; => [:qed my-and-intro]
+
+```
+
+The proof is accepted but even for this simple fact writing explicitly
+the whole proof term is cumbersome at the very least and, most of all, quite unlike 
+a "pencil & paper" mathematical proof.
+So we will rewrite this proof using a more *declarative* style.
+We will also use the variant `try-proof` which doesn't generate
+an exception when a proof fails. This is a very useful tool when
+elaborating proofs step by step.
+
+First we have our basic assumptions: that the propositions `A` and `B` hold.
+We can write the following:
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]))
+;; => [:failed my-and-intro {:msg "Proof incomplete."}]
+
+```
+
+Assumptions as introduced by the following form:
+
+```clojure
+(assume [hyp1 typ1
+         ...
+        [hypN typN]
+   <script-within-assumptions>)
+```
+
+
+Technically speaking, this creates the enclosing
+lambda's corresponding to the assumptions. But from a logical
+point of view, we just have to see this as a statement of assumptions.
+
+When evaluating the form above the "error" message we get is that
+the proof is incomplete. This  is good because it also says
+that there is no error in our reasoning, only we're not finished.
+
+
+To finish the proof we have to find a term of type `(my-and A B)`.
+Now, let's remind the internal definition of conjunction:
+
+
+```clojure
+(forall [C :type] (==> (==> A B C) C))
+```
+
+
+There are two further assumptions here: that we have an arbitrary
+type `C` and an assumption, let's say `H` that `(==> A B C)`
+(from `A` and `B` we can deduce `C`). So in the next step we get
+the following:
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]
+    (assume [C :type
+             H (==> A B C)])))
+;; => [:failed my-and-intro {:msg "Proof incomplete."}]
+
+```
+
+Note that we could use a single `assume` form here but
+we have here perhaps a cleaner separation between the
+theorem assumptions (often called the *hypotheses*),
+and the ones corresponding to the definition of `my-and`.
+In the next step, we have to build, from all these
+assumptions, a term of type `C`. We say that our current *goal*
+is the proposition `C`. Let's proceed step-by-step.
+First, we can see `H` as a function that expects a first
+argument of type `A`, and returns a function of type `(==> B C)`.
+We can use the `have` form to create such an intermediate result.
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]
+    (assume [C :type
+             H (==> A B C)]
+      (have <a> (==> B C) :by (H x)))))
+;; => [:failed my-and-intro {:msg "Proof incomplete."}]
+
+```
+
+A `have` proof step has the following form:
+
+
+```clojure
+(have <step-name> <prop/type> :by <proof-term>)
+```
+This an intermediate proof that the proposition `<prop/type>` (remember proposition-as-type)
+holds with the given `<proof-term>'. Hence this is like a statement and proof of an intermediate
+lemma, a building block for a full proof.
+
+
+Once again there is no error here, and what we did is to simultaneously:
+
+ - from a computational point of view created a function named `<a>` of type `(==> B C)`
+ - from a logical point of view demonstrated that `(==> B C)` holds, under the specified hypotheses.
+
+This is really the Curry-Howard correspondance at work.
+Not that such an intermediate result is checked by LaTTe. To observe this, let's write
+a wrong statement:
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]
+    (assume [C :type
+             H (==> A B C)]
+      (have <a> (==> C C) :by (H x)))))
+;; => [:failed my-and-intro
+;;       {:msg "Have step elaboration failed: synthetized term type and expected type do not match",
+;;        :have-name <a>,
+;;        :expected-type (Π [⇧ C] C),
+;;        :synthetized-type (Π [⇧' B] C), :meta {:line 302, :column 7}}]
+
+```
+
+As we can see, LaTTe is very verbose in its error message, which is often a good thing but
+only after some practice with the environment.
+Going back to our *correct* intermediate result, we can easily produce a desired term
+of type `C`, because we have now our function `<a>` of type `(==> B C)`.
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]
+    (assume [C :type
+             H (==> A B C)]
+      (have <a> (==> B C) :by (H x))
+      (have <b> C :by (<a> y)))))
+;; => [:failed my-and-intro {:msg "Proof incomplete."}]
+
+```
+
+You would maybe expect that the proof was complete, but what we did
+here was just asserting two intermediate propositions under the specified
+assumptions. What LaTTe did was to check these to be correct, but we
+are still missing the connection with our initial objective.
+To conclude our proof we have to use the `qed` form, as follows:
+
+
+```clojure
+(try-proof 'my-and-intro
+  (assume [x A
+           y B]
+    (assume [C :type
+             H (==> A B C)]
+      (have <a> (==> B C) :by (H x))
+      (have <b> C :by (<a> y))))
+  (qed <b>))
+;; => [:qed my-and-intro]
+
+```
+
+Note that we first closed our assumptions, and used the intermediate
+step `<b>` outside the assumptions. Technically speaking, this builds
+up the term `<b>` within the required lambdas. Put in other terms,
+our direct proof and this declarative version are exactly the same
+internally. But as we will see, the fact that proofs can be elaborated
+in a step-by-step manner like what we did last really makes LaTTe
+a proof assistant and not just a type-checker. We can do *real* mathematics
+with only three constructs: `assume`, `have` and a final `qed`.
+
+
+And now we can write our example:
+
+
+```clojure
+(example [[A :type]]
+    (==> A A (my-and A A))
+  (qed (my-and-intro A A)))
+;; => [:checked :example]
+
+```
+
+In the LaTTe prelude the introduction rule is called `and-intro-thm` thus
+we can rewrite the example as follows:
+
+
+```clojure
+(example [[A :type]]
+    (==> A A (and A A))
+  (qed (p/and-intro-thm A A)))
+;; => [:checked :example]
+
+```
+
+We'll see that there is a variant named `and-intro` in the prelude that is
+used much more often in practice.
+
+
+
+
+
+### Elimination rules
+
+
+Let's see now if we can do the same for the elimination rules.
+There are two ways to "eliminate" a conjunction:
+
+
+```
+ (and A B)                      (and A B) 
+=========== (and-elim-left)    =========== (and-elim-right)
+     A                              B
+```
+
+This is obvious: if both `A` and `B` hold then *either*
+`A` or `B` can be deduced. Let's state and prove the left version.
+
+
+```clojure
+(defthm my-and-elim-left
+  "Left-elimination of conjunction."
+  [[A :type] [B :type]]
+  (==> (my-and A B)
+       A))
+
+```
+
+The proof for this is easy but not trivial. Let's first sketch it.
+Having `(and A B)` means `(forall [C :type] (==> (==> A B C) C))` by definition.
+Hence, specializing for proposition `A` we get `(==> (==> A B A) A)`.
+(we just replaced `C` by `A` in the definition).
+So we can obtained our expected goal `A` if we can prove that `(==> A B A)' is
+true. Let's state this as an intermediate lemma:
+
+
+```clojure
+(deflemma my-impl-ignore
+  [[A :type] [B :type]]
+  (==> A B A))
+
+```
+
+A *lemma* is like a theorem but with the purpose of being used as an
+intermediate step in the proof of an *actual* theorem. The way we
+interprete this in Clojure is that a theorem is exported in the namespace
+whereas a lemma remains *private*. This can be of course changed by
+playing with Clojure's metadata (a very neat mechanism by the way!).
+I find it quite interesting to give precise interpretation of relatively
+subjective mathematical concepts: a theorem is public/exported, a lemma
+is not.
+
+The proof of the lemma is straightforward so let's write it in the declarative style:
+
+
+```clojure
+(proof 'my-impl-ignore
+  (assume [x A
+           y B]
+    (have <a> A :by x))
+  (qed <a>))
+
+```
+
+And now we are ready for the proof of the left elimination:
+
+
+```clojure
+(proof 'my-and-elim-left
+  (assume [H (my-and A B)]
+    "We first specialize the definition of `my-and`"
+    (have <a> (==> (==> A B A) A) :by (H A))
+    "Then we use our intermediate lemma"
+    (have <b> (==> A B A) :by (my-impl-ignore A B))
+    "And we reach our goal"
+    (have <c> A :by (<a> <b>)))
+  (qed <c>))
+
+```
+
+Note that we intersped some comments in the proof, so that it can
+be read almost like a traditional mathematical proof.
+
+
+In the LaTTe prelude, the left elimination rule is called `and-elim-left-thm`.
+There is a variant, named `and-elim-left`, that is used in most cases, we'll
+see why in a moment.
+
+
+**Exercise**: state and prove the right elimination rule: `my-and-elim-right'.
+(in the prelude, the rule is `and-elim-right-thm' and the one used in practice
+is `and-elim-right`).
+
+
+Now that we have our reasoning rules for conjunction, let's try to use them.
+For this we state the following proposition (as a side note, I personnally
+like to call a yet unproven theorem a proposition).
+
+
+```clojure
+(defthm my-and-trans
+  "A kind of transitivity for conjunction."
+  [[A :type] [B :type] [C :type]]
+  (==> (my-and A B) (my-and C B)
+       (my-and A C)))
+
+```
+
+This is not a very interesting proposition, but it should hold and intuitively
+we should only need the introduciton and left-elimination rules we just
+proved.
+
+
+Let's write again our proof sketch before writing the LaTTe code
+(in practice, we would rather use the incremental construction of
+"incomplete proofs" until reaching our goal, but we'll start to be
+less verbose from now on).
+
+
+First, our assumptions are, say:
+- an hypothesis that `(my-and A B)` holds, let's call it `H1`
+- an hypothesis tha  `(my-and C B)` holds, let's call it `H2`
+Now, we'll first prove that `A` holds, using our left elimination rule.
+The definition of the term `(my-and-elim-left A B)' is the following:
+```clojure
+(==> (my-and A B) A)
+```
+Hence, in computational terms, it is a function taking as a parameter
+a term of type `(my-and A B)` and returning an `A`.
+Hence, to obtain an `A` we simply have to apply this function to our
+term `H1`.
+Similarly, to obtain a `B` we have to apply the term `H2` to the
+function `(my-and C B)`.
+And now that we have an `A` and a `B` we can build a conjunction
+using the introdution rule.
+The complete proof is as follows:
+
+
+```clojure
+(proof 'my-and-trans
+  (assume [H1 (my-and A B)
+           H2 (my-and C B)]
+    (have <a> A :by ((my-and-elim-left A B) H1))
+    (have <b> C :by ((my-and-elim-left C B) H2))
+    (have <c> (my-and A C) :by ((my-and-intro A C) <a> <b>)))
+  (qed <c>))
+;; => [:qed my-and-trans]
+
+```
+
+This works! We performed our first elimnation-then-introduciton reasoning,
+which is a very frequent proof scheme.
+
+
+But we can argue that from a mathematical point of view, the proof
+is a little bit verbose and with some redundancy.
+
+
+LaTTe offers some extra features, being basic type theory, to address
+some of these issues. Let's restate our theorem based on the
+prelude library.
+
+
+```clojure
+(defthm and-trans
+  "A kind of transitivity for conjunction."
+  [[A :type] [B :type] [C :type]]
+  (==> (and A B) (and C B)
+       (and A C)))
+
+```
+
+This is the same as before, but this time using the prelude definition
+for conjunction.
+Now we remark that the assumptions are written in the theorem statement,
+so we might wonder why we have to restate them in the proof.
+This is sometimes useful, because there can be some "distance" between
+the theorem and its proof (e.g. because we need to state and proof intermediate
+lemmas), but very often the proof is "just below" the theorem.
+Here our hypotheses are short so it's not really a problem, but sometimes
+hypotheses are large multiline statements.
+In such cases, we can simply use the underscode character `_` and let
+LaTTe figure out the hypotheses given the definition. Of course there is
+no magic: they will be exaclty like before.
+
+
+So the beginning of our proof will be as follows:
+
+
+```clojure
+(assume [H1 _ H2 _]
+   <rest-of-the-proof>)
+```
+Of course we have then to look at the hypotheses in the theorem body.
+
+
+
+In the previous proof, it was also a little bit cumbersome to explicitly
+write the types for the elimination and introduction rules. For example,
+it should be obvious for `H1` that the involved types as `A` and `B`
+(in this order), and similarly `C` and `B` for `H2`.
+In a proof assistant such as Coq or Agda, a very powerfull type inference
+"algorithm" (I use quotes since the problem is indecidable in type theory, i.e.
+the inference can fail or loops). In LaTTe I decided not to rely on such
+an algorithm because of its complexity: both from the implementor and
+the user point of view. In the current state of affairs, we use the
+notion of an *implicit*, which consists in allowing the user of LaTTe
+to write an arbitrary Clojure program to analyse and transform a term.
+There are many such implicits in the prelude, and in particular:
+
+
+- the introduction rule for conjunction `and-intro`
+- the left and right elimination rules: `and-elim-left` and `and-elim-right`.
+
+
+Let's see their documentation:
+
+(doc p/and-intro)
+;;{
+latte-prelude.prop/and-intro
+ 
+```
+(and-intro a b)```
+
+An introduction rule that takes a proof
+`a` of type `A`, a proof `b` of type `B` and yields
+a proof of type `(and A B)`.
+
+This is an implicit version of [[and-intro-thm]].
+
+
+```clojure
+(doc p/and-elim-left)
+```
+
+latte-prelude.prop/and-elim-left
+  
+```
+(and-elim-left and-term)```
+
+An implicit elimination rule that takes a proof
+of type `(and A B)` and yields a proof of `A`.
+
+This is an implicit version of [[and-elim-left-thm]].
+
+
+```clojure
+(doc p/and-elim-right)
+```
+
+latte-prelude.prop/and-elim-right
+  
+```
+(and-elim-right and-term)```
+
+An implicit elimination rule that takes a proof
+of type `(and A B)` and yields a proof of `B`.
+
+This is an implicit version of [[and-elim-right-thm]].
+
+
+
+Using these implicit variants, we do not need to state the
+types explicitly when introducing or eliminating the conjunctions.
+Our proof then is simplified as follows.
+
+
+```clojure
+(proof 'and-trans
+  (assume [H1 _ H2 _]
+    (have <a> A :by (p/and-elim-left H1))
+    (have <b> C :by (p/and-elim-left H2))
+    (have <c> (and A C) :by (p/and-intro <a> <b>)))
+  (qed <c>))
+;; => [:qed and-trans]
+
+```
+
+With some practice, and inspecting the quite readable sources
+of the prelude, you will quickly master the use of implicits.
+But don't forget that the non-implicit versions are always
+useable. Moreover, implicit variants are not always proposed,
+so consulting the documentation is always a good thing.
+
+
+
+## Disjunction and proof-by-cases
+
+(TODO)
+
+
+
+
+## Proving by contradiction
+
+(TODO)
+
+
+
+
+
+
+
