@@ -91,6 +91,7 @@
 (doc my-and)
 
 ;;{
+;; ----
 ;; ```
 ;; latte-tutorial.ch03-logic-bits/my-and
 ;; ([[A :type] [B :type]])
@@ -98,12 +99,13 @@
 ;; (forall [C :type] (==> (==> A B C) C))
 ;; ```
 ;; **Definition**: logical conjunction, a remake.
+;; ----
 ;;}
 
 ;;{ 
 ;; We will see many definitions in this tutorials, so let's
 ;; go back to what is called the "second order characterization
-;; of conjunction" (originating from *System F*).
+;; of conjunction" (originating from [System F](https://en.wikipedia.org/wiki/System_F)).
 ;; While this can be interpreted as a
 ;; generic proof scheme based on the knowledge of two
 ;; propositions `A` and `B`, in natural deduction we
@@ -130,7 +132,7 @@
 ;; 
 ;; This is often introduced in an axiomatic way, i.e. without any justification,
 ;; but in type theory the definition above can be used to prove this as a theorem.
-;; To introduce a theorem, we use the `defthm' form, and this is how we
+;; To introduce a theorem, we use the `defthm` form, and this is how we
 ;; can formalize the introduction rule in LaTTe:
 ;;}
 
@@ -178,14 +180,14 @@ my-and-intro
 
 
 ;;{
-;; The `try-example' form let us state propositions together with
+;; The `try-example` form let us state propositions together with
 ;; their proof. It is like a theorem that we do not plan to save for further
 ;; use. In real developments, the use of the `example` variant is recommended
 ;; since it will throw an exception in case of a problem, hence it is a
 ;; nice utility for both documenting by example as well as self-testing.
 ;; We will go back to the way the proofs are written at a later stage,
 ;; so let's just observe that using a theorem without a proof is forbidden
-;; in LaTTe (or at least it should be, cf. https://github.com/latte-central/latte-kernel/commit/0ae1f187de15d60ff0376520575e9bdf9a68e21c).
+;; in LaTTe (or at least [it should be](https://github.com/latte-central/latte-kernel/commit/0ae1f187de15d60ff0376520575e9bdf9a68e21c)).
 ;;}
 
 ;;{
@@ -307,7 +309,7 @@ my-and-intro
 ;; (have <step-name> <prop/type> :by <proof-term>)
 ;; ```
 ;; This an intermediate proof that the proposition `<prop/type>` (remember proposition-as-type)
-;; holds with the given `<proof-term>'. Hence this is like a statement and proof of an intermediate
+;; holds with the given `<proof-term>`. Hence this is like a statement and proof of an intermediate
 ;; lemma, a building block for a full proof.
 ;; 
 
@@ -432,7 +434,7 @@ my-and-intro
 ;; Having `(and A B)` means `(forall [C :type] (==> (==> A B C) C))` by definition.
 ;; Hence, specializing for proposition `A` we get `(==> (==> A B A) A)`.
 ;; (we just replaced `C` by `A` in the definition).
-;; So we can obtained our expected goal `A` if we can prove that `(==> A B A)' is
+;; So we can obtained our expected goal `A` if we can prove that `(==> A B A)` is
 ;; true. Let's state this as an intermediate lemma:
 ;;}
 
@@ -483,8 +485,8 @@ my-and-intro
 ;; see why in a moment.
 ;; 
 
-;; **Exercise**: state and prove the right elimination rule: `my-and-elim-right'.
-;; (in the prelude, the rule is `and-elim-right-thm' and the one used in practice
+;; **Exercise**: state and prove the right elimination rule: `my-and-elim-right`.
+;; (in the prelude, the rule is `and-elim-right-thm` and the one used in practice
 ;; is `and-elim-right`).
 ;; 
 
@@ -515,7 +517,7 @@ my-and-intro
 ;; - an hypothesis that `(my-and A B)` holds, let's call it `H1`
 ;; - an hypothesis tha  `(my-and C B)` holds, let's call it `H2`
 ;; Now, we'll first prove that `A` holds, using our left elimination rule.
-;; The definition of the term `(my-and-elim-left A B)' is the following:
+;; The definition of the term `(my-and-elim-left A B)` is the following:
 ;; ```clojure
 ;; (==> (my-and A B) A)
 ;; ```
@@ -607,42 +609,51 @@ my-and-intro
 
 (doc p/and-intro)
 ;;{
+;; ----
+;; ```
 ;; latte-prelude.prop/and-intro
 ;;  
+;; (and-intro a b)
 ;; ```
-;; (and-intro a b)```
 ;; 
 ;; An introduction rule that takes a proof
 ;; `a` of type `A`, a proof `b` of type `B` and yields
 ;; a proof of type `(and A B)`.
 ;; 
 ;; This is an implicit version of [[and-intro-thm]].
+;; ----
 ;;}
 
 (doc p/and-elim-left)
 ;;{
+;; ----
+;; ```
 ;; latte-prelude.prop/and-elim-left
 ;;   
+;; (and-elim-left and-term)
 ;; ```
-;; (and-elim-left and-term)```
 ;; 
 ;; An implicit elimination rule that takes a proof
 ;; of type `(and A B)` and yields a proof of `A`.
 ;; 
 ;; This is an implicit version of [[and-elim-left-thm]].
+;; ----
 ;;}
 
 (doc p/and-elim-right)
 ;;{
+;; ----
+;; ```
 ;; latte-prelude.prop/and-elim-right
 ;;   
+;; (and-elim-right and-term)
 ;; ```
-;; (and-elim-right and-term)```
 ;; 
 ;; An implicit elimination rule that takes a proof
 ;; of type `(and A B)` and yields a proof of `B`.
 ;; 
 ;; This is an implicit version of [[and-elim-right-thm]].
+;; ----
 ;;}
 
 ;;{
