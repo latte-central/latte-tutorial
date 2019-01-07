@@ -89,7 +89,7 @@
 
 (doc my-and)
 ;;{
-;; ----
+;; 
 ;; ```
 ;; latte-tutorial.ch03-logic-bits/my-and
 ;; ([[A :type] [B :type]])
@@ -608,7 +608,7 @@ my-and-intro
 
 (doc p/and-intro)
 ;;{
-;; ----
+;; 
 ;; ```
 ;; latte-prelude.prop/and-intro
 ;;  
@@ -620,12 +620,12 @@ my-and-intro
 ;; a proof of type `(and A B)`.
 ;; 
 ;; This is an implicit version of [[and-intro-thm]].
-;; ----
+;; 
 ;;}
 
 (doc p/and-elim-left)
 ;;{
-;; ----
+;; 
 ;; ```
 ;; latte-prelude.prop/and-elim-left
 ;;   
@@ -636,12 +636,12 @@ my-and-intro
 ;; of type `(and A B)` and yields a proof of `A`.
 ;; 
 ;; This is an implicit version of [[and-elim-left-thm]].
-;; ----
+;; 
 ;;}
 
 (doc p/and-elim-right)
 ;;{
-;; ----
+;; 
 ;; ```
 ;; latte-prelude.prop/and-elim-right
 ;;   
@@ -652,7 +652,7 @@ my-and-intro
 ;; of type `(and A B)` and yields a proof of `B`.
 ;; 
 ;; This is an implicit version of [[and-elim-right-thm]].
-;; ----
+;; 
 ;;}
 
 ;;{
