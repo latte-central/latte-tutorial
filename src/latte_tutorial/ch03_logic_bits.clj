@@ -204,7 +204,7 @@ my-and-intro
 ;; (proof '<theorem-name>
 ;;    <proof-script>)
 ;;```
-;;
+;; 
 ;; The `<proof-script>` part is based on a very reduced set of constructions, the simplest one
 ;; being `(qed <proof-term>)` when we want to conclude the proof using a proof term.
 ;; Here is an example of a direct demonstration using `qed`:
