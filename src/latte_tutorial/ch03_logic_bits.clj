@@ -96,9 +96,9 @@
 ;;   
 ;; (forall [C :type] (==> (==> A B C) C))
 ;; ```
-;;
+;; 
 ;; **Definition**: logical conjunction, a remake.
-;;
+;; 
 ;;}
 
 ;;{ 
