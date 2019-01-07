@@ -22,8 +22,8 @@ do some actual logic.
 
 ```
 
-*Natural deduction* is a way of presenting and formalizing logics
-based on:
+[Natural deduction](https://en.wikipedia.org/wiki/Natural_deduction)
+is, very roughly, a way of presenting and formalizing logics based on:
 - introduction rules, or how to construct logical statements
 - elimination rules, or how to take them apart.
 
@@ -37,9 +37,8 @@ using function application.
 In this chapter of the tutorial, we will discuss the introduction
 and elimination rules for other important logical constructs.
 The implementation of this basic rules can be found in the
-`prop` namespace `latte-prelude` library.
-
-cf. https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/prop.clj
+[prop](https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/prop.clj) namespace
+of the [latte-prelude](https://github.com/latte-central/latte-prelude) library.
 
 
 
@@ -94,7 +93,6 @@ documentation:
 (use 'clojure.repl)
 
 (doc my-and)
-
 ```
 
 ----
@@ -104,7 +102,9 @@ latte-tutorial.ch03-logic-bits/my-and
   
 (forall [C :type] (==> (==> A B C) C))
 ```
+;;
 **Definition**: logical conjunction, a remake.
+;;
 ----
 
 
