@@ -203,7 +203,7 @@ my-and-intro
 ;; ```clojure
 ;; (proof '<theorem-name>
 ;;    <proof-script>)
-;;```
+;; ```
 ;; 
 ;; The `<proof-script>` part is based on a very reduced set of constructions, the simplest one
 ;; being `(qed <proof-term>)` when we want to conclude the proof using a proof term.
