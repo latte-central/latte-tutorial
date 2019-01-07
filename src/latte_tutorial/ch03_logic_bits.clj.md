@@ -97,10 +97,10 @@ documentation:
 
 ```
 
+```
 latte-tutorial.ch03-logic-bits/my-and
 ([[A :type] [B :type]])
   
-```
 (forall [C :type] (==> (==> A B C) C))
 ```
 **Definition**: logical conjunction, a remake.
