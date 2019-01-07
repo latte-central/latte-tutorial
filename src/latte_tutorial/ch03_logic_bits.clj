@@ -99,7 +99,6 @@
 ;;
 ;; **Definition**: logical conjunction, a remake.
 ;;
-;; ----
 ;;}
 
 ;;{ 

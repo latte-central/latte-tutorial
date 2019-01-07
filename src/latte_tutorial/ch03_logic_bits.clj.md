@@ -105,7 +105,6 @@ latte-tutorial.ch03-logic-bits/my-and
 ;;
 **Definition**: logical conjunction, a remake.
 ;;
-----
 
 
 
