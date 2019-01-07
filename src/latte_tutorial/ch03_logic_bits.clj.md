@@ -215,7 +215,7 @@ To prove a theorem in LaTTe, we have to use the `proof` function (it is not a ma
 ```clojure
 (proof '<theorem-name>
    <proof-script>)
-;;```
+```
 
 The `<proof-script>` part is based on a very reduced set of constructions, the simplest one
 being `(qed <proof-term>)` when we want to conclude the proof using a proof term.
