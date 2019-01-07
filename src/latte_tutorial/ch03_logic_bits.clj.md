@@ -15,9 +15,13 @@ do some actual logic.
                                           proof try-proof
                                           assume have qed]]
             ;; we will also exploit the basic proposition from the prelude
-            [latte-prelude.prop :as p :refer [and or not]])
+            [latte-prelude.prop :as p :refer [and or not]]
 
-  ;; also, these belong to logic
+            ;; we will also use the documentation
+            [clojure.repl :refer [doc]])
+
+  
+  ;; also, these belong to logic or formal arithmetic
   (:refer-clojure :exclude [and or not]))
 
 ```
@@ -90,8 +94,6 @@ documentation:
 
 
 ```clojure
-(use 'clojure.repl)
-
 (doc my-and)
 ```
 
@@ -642,15 +644,15 @@ notion of an *implicit*, which consists in allowing the user of LaTTe
 to write an arbitrary Clojure program to analyse and transform a term.
 There are many such implicits in the prelude, and in particular:
 
-
 - the introduction rule for conjunction `and-intro`
 - the left and right elimination rules: `and-elim-left` and `and-elim-right`.
 
-
 Let's see their documentation:
 
+
+```clojure
 (doc p/and-intro)
-;;{
+```
 
 ```
 latte-prelude.prop/and-intro
@@ -669,7 +671,6 @@ This is an implicit version of [[and-intro-thm]].
 ```clojure
 (doc p/and-elim-left)
 ```
-
 
 ```
 latte-prelude.prop/and-elim-left
@@ -729,7 +730,117 @@ so consulting the documentation is always a good thing.
 
 ## Disjunction and proof-by-cases
 
-(TODO)
+Instead of reconstructing things like we did with conjunction, we will
+directly use the introduction and elimination for disjunction (logical *or*)
+as they are defined in the prelude, and not redefine them (it is a good exercise).
+;;
+There are two introduction rules and one elimination rule for `or`, which is exactly
+the opposite of conjunction. The introduction rules are as follows:
+
+```clojure
+(defthm or-intro-left-thm
+  [[A :type] [B :type]]
+  (==> A
+       (or A B)))
+
+(defthm or-intro-right-thm
+  [[A :type] [B :type]]
+  (==> B
+       (or A B)))
+```
+The meaning is obvious, if `A` holds then the disjunction `A` *or* `B` also holds, this is the left introduction.
+And the right introduction can be applied if `B` holds. We can also use the *implicits* `or-intro-left` (resp. `or-intro-right`)
+with which the types `B` (resp. `A`) are inferred.
+;;
+
+
+```clojure
+(doc p/or-intro-left)
+```
+
+...
+```
+(or-intro-left left-term right-type)
+```
+
+
+```clojure
+(doc p/or-intro-right)
+```
+
+...
+```
+(or-intro-right left-type right-term)
+```
+
+
+```clojure
+;; As an illustration, if you know that both `A` and `B` holds, then there are two ways to prove that either of them holds.
+;;}
+
+(example [[A :type] [B :type]]
+    (==> (and A B)
+         (or A B))
+  ;; The "left" proof:
+  (assume [H (and A B)]
+    (have <a> A :by (p/and-elim-left H))
+    "We have A thus we can introduce (or A B) from the left"
+    (have <b> (or A B) :by (p/or-intro-left <a> B))) ;; a.k.a. ((p/or-intro-left-thm A B) <a>)))
+  (qed <b>))
+;; => [:checked :example]
+
+(example [[A :type] [B :type]]
+    (==> (and A B)
+         (or A B))
+  ;; The "right" proof:
+  (assume [H (and A B)]
+    (have <a> B :by (p/and-elim-right H))
+    "We have B thus we can introduce (or A B) from the right"
+    (have <b> (or A B) :by (p/or-intro-right A <a>))) ;; a.k.a. ((p/or-intro-right-thm A B) <a>)))
+  (qed <b>))
+;; => [:checked :example]
+
+```
+
+The elimination rule is a little bit more complex because it implements
+a very general *proof-by-case* scheme.
+
+```clojure
+(defthm or-elim-thm
+  [[A :type] [B :type]]
+  (==> (or A B)
+       (forall [C :type]
+         (==> (==> A C)
+              (==> B C)
+              C))))
+```
+
+;;{
+Its informal reading is as follows. If you know that either the proposition `A` or the proposition `B` holds
+(it is not exclusive: `A` and `B` may be true also, but then it is either to use this fact), then suppose
+your goal is to prove some proposition `C`. Then you have two things to do to demonstrate that `C` holds:
+
+- the first "left" case: under the assumption that `A` holds, you prove that also `C` holds, i.e. `A` implies `C`
+- the second "right" case: you prove that `B` implies `C` also
+
+Hence, since in both case `C` is true you know that `(or A B)` is enough as an assumption.
+There is of course an implicit version `or-elim` which is the one we will use in practice.
+
+
+```clojure
+(doc p/or-elim)
+```
+
+...
+```
+(or-elim or-term prop left-proof right-proof)
+```
+
+An elimination rule that takes a proof
+`or-term` of type `(or A B)`, a proposition `prop`,
+a proof `left-proof` of type `(==> A prop)`, 
+a proof `right-proof` of type `(==> B prop)`, and thus
+concludes that `prop` holds by `or-elim-thm`.
 
 
 
