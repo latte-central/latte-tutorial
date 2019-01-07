@@ -90,11 +90,13 @@ Such a definition is also a `def` in the Clojure sense, it has e.g. a
 documentation:
 
 
-
+```clojure
 (use 'clojure.repl)
 
 (doc my-and)
-;;{
+
+```
+
 latte-tutorial.ch03-logic-bits/my-and
 ([[A :type] [B :type]])
   
