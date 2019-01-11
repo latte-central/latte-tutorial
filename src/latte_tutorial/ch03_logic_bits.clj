@@ -14,7 +14,7 @@
                                           proof try-proof
                                           assume have qed]]
             ;; we will also exploit the basic proposition from the prelude
-            [latte-prelude.prop :as p :refer [and or not]]
+            [latte-prelude.prop :as p :refer [and or not <=>]]
 
             ;; we will also use the documentation
             [clojure.repl :refer [doc]])
@@ -666,6 +666,129 @@ my-and-intro
     (have <c> (and A C) :by (p/and-intro <a> <b>)))
   (qed <c>))
 ;; => [:qed and-trans]
+
+;;{
+;; ### Nary variants
+;;
+;; The conjunction is LaTTe is a binary operator, like it is always the case
+;; in mathematical logics. However as Lispers we know the interest of n-ary
+;; associative operators. While we cannot do so at the primitive level,
+;; the prelude handles such cases, as illustrated by the following examples.
+;;}
+
+;; n-ary introduction
+(example [[A :type] [B :type] [C :type] [D :type]
+          [a A] [b B] [c C] [d D]]
+    (p/and* A B C D)
+  (qed (p/and-intro* a b c d)))
+;; => [:checked :example]
+
+;; n-ary eliminations
+(example [[A :type] [B :type] [C :type] [D :type]]
+    (==> (p/and* A B C D)
+         A)
+  (assume [H _]
+    ;; eliminate first operand (A)
+    (have <a> A :by (p/and-elim* 1 H)))
+  (qed <a>))
+;; => [:checked :example]
+
+(example [[A :type] [B :type] [C :type] [D :type]]
+    (==> (p/and* A B C D)
+         C)
+  (assume [H _]
+    ;; eliminate third operand (C)
+    (have <a> C :by (p/and-elim* 3 H)))
+  (qed <a>))
+;; => [:checked :example]
+
+;;{
+;; An important advice is to avoid mixing the binary and nary constructs:
+;;  - use `and-intro`, `and-elim-left` and `and-elim-r ight` with binary conjunction `and`
+;;  - use `and-intro*` and `and-elim*` with the nary variant `and*`
+;;}
+
+;;{
+;; ### Equivalence = conjunction of implications
+;;
+;; An important construct of logic is the equivalence of two propositions,
+;; which is defined as follows in the prelude:
+;;
+;; ```clojure
+;; (definition <=>
+;;   "Logical equivalence or 'if and only if'."
+;;   [[A :type] [B :type]]
+;;   (and (==> A B)
+;;        (==> B A)))
+;; ```
+;; The introduction rule is `iff-intro-thm` in the prelude, but it's
+;; quite easy to reconstruct one.
+;;}
+
+(defthm my-iff-intro-thm
+  "Introduction of equivalence."
+  [[A :type] [B :type]]
+  (==> (==> A B)
+       (==> B A)
+       (<=> A B)))
+;; => [:declared :theorem my-iff-intro-thm]
+
+(proof 'my-iff-intro-thm
+  (assume [Hif (==> A B)
+           Honly-if (==> B A)]
+    (have <a> (<=> A B) :by (p/and-intro Hif Honly-if)))
+  (qed <a>))
+;; => [:qed my-iff-intro-thm]
+
+;;{
+;; In the same spirit the elimination rules `iff-elim-if-thm` and `if-elim-only-if-thm`
+;; of the prelude are conjunction eliminations in disguise.
+;;}
+
+(defthm my-iff-elim-if-thm
+  "Elimination of \"if\" part of an equivalence."
+  [[A :type] [B :type]]
+  (==> (<=> A B)
+       (==> A B)))
+;; => [:declared :theorem my-iff-elim-if-thm]
+
+(proof 'my-iff-elim-if-thm
+  (assume [Heq (<=> A B)]
+    (have <a> (==> A B) :by (p/and-elim-left Heq)))
+  (qed <a>))
+;; => [:qed my-iff-elim-if-thm]
+
+;;{
+;; **Exercise**: define and prove the "only if" elimination.
+;;}
+
+;;{
+;; Note that in the prelude the rules to use in practice are
+;; the implicit ones: `iff-intro`, `iff-elim-if` and `iff-elim-only-if`.
+;;}
+
+(example [[A :type] [B :type]]
+    (==> (==> A B)
+         (==> B A)
+         (<=> A B))
+  (assume [H1 _ H2 _]
+    (have <a> (<=> A B) :by (p/iff-intro H1 H2)))
+  (qed <a>))
+;; => [:checked :example]
+
+(example [[A :type] [B :type]]
+    (==> (<=> A B)
+         (==> A B))
+  (qed (lambda [H (<=> A B)]
+               (p/iff-elim-if H))))
+;; => [:checked :example]
+
+(example [[A :type] [B :type]]
+    (==> (<=> A B)
+         (==> B A))
+  (qed (lambda [H (<=> A B)]
+               (p/iff-elim-only-if H))))
+;; => [:checked :example]
 
 ;;{
 ;; With some practice, and inspecting the quite readable sources

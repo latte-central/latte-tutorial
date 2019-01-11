@@ -7,6 +7,6 @@
                  [latte "1.0b3-SNAPSHOT"]
                  [latte-prelude "1.0b3-SNAPSHOT"]
                  [latte-sets "1.0b3-SNAPSHOT"]
-                 [latte-integers "1.0b3-SNAPSHOT"]])
+                 [latte-integers "0.10.0-SNAPSHOT"]])
 
 
