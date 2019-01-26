@@ -1,5 +1,5 @@
 ;;{
-;; # Chapter 1 : first steps
+;; # First steps
 ;;}
 
 (ns latte-tutorial.ch01-first-steps)

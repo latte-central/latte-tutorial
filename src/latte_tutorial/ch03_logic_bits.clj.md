@@ -1,6 +1,6 @@
 
 
-# Chapter 3: Bits of logic with natural deduction
+# Bits of logic with natural deduction
 
 Now that we have some knowledge of the rules of the game,
 we can start playing with the LaTTe proof assistant, and
@@ -980,6 +980,7 @@ An elimination rule that takes a proof
 a proof `left-proof` of type `(==> A prop)`, 
 a proof `right-proof` of type `(==> B prop)`, and thus
 concludes that `prop` holds by `or-elim-thm`.
+
 
 
 

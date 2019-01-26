@@ -9,11 +9,13 @@
 ;; This document is a tutorial introduction to the LaTTe proof assistant.
 ;; 
 ;; Here are the primary goals:
+;; 
 ;;   - a quick startup guide to LaTTe
 ;;   - a pedagogical overview of its main features
 ;;   - a first experiment with important proof rules
 ;; 
 ;; The main non-goals are:
+;; 
 ;;   - a complete course about e.g. type theory or logic, or whatever
 ;;   - an exhaustive manual for the proof assistant
 ;;   - a maths lecture
@@ -21,17 +23,18 @@
 ;; So I'll go straight-to-the-point, often omitting (probably) important
 ;; aspects.
 ;; 
-;; The tutorial is heavily inspired by the talk about LaTTe that I gave
-;; at EuroClojure'2016, cf. https://www.youtube.com/watch?v=5YTCY7wm0Nw
-;; ... note that LaTTe changed a lot since the talk. But it is still an
+;; The tutorial is heavily inspired by [a talk about LaTTe](https://www.youtube.com/watch?v=5YTCY7wm0Nw)
+;; that I gave at EuroClojure'2016. 
+;; LaTTe changed quite a bit since then, but it is still an
 ;; interesting experience of "live coding mathematics".
 ;; 
-;; Note that this is a *literate programming* document, which means it is
+;; The source for this tutorial is a *literate programming* document, which means it is
 ;; both a textual document with Clojure (and LaTTe) code examples, and also
 ;; a set of heavy commented Clojure source files that can be compiled, executed,
 ;; tested, etc.
 ;; 
 ;; For each namespace `nsp` (in the Clojure terminology), you'll find :
+;; 
 ;;  - one file `nsp.clj` containing the Clojure **code source view** with all the explanations
 ;;    (e.g. this very sentence) as comments
 ;;  - a corresponding file `nsp.clj.md` containing the **document view** as a markdown
@@ -45,13 +48,13 @@
 ;; => 42
 
 ;;{
-;; For many examples the expected evaluation results is show as a `=> <value>` comment.
+;; For many examples the expected evaluation results is shown as a comment: `;; => <value>`.
 ;; 
 ;; **Remark**: The translation of the code source view to the document view is handled
-;; by a very simple *Markownize* tool that you can find at: https://github.com/fredokun/markdownize
+;; by a very simple *Markownize* tool that you can find at: <https://github.com/fredokun/markdownize>
 ;; 
 ;; Also, there are a few exercises and questions in the `master` branch of the tutorial.
-;; The solutions are available in the `solution' branch (which should be at least one commit beyond `master`).
+;; The solutions are available in the `solutions` branch (which should be at least one commit beyond `master`).
 ;;  
 ;;}
 
@@ -60,15 +63,16 @@
 ;; 
 ;; I think it is good to introduce oneself when talking to other people.
 ;; 
-;; My name is Frederic Peschanski, I am associated professor in computer science
+;; My name is Frederic Peschanski, I am an associated professor in computer science
 ;; at Sorbonne University in Paris, France. I do research mostly on the theoretical
-;; sides, but my main hobby is programming thus I try sometimes to mix the work and pleasure.
+;; sides, but my main hobby is programming thus I try sometimes to mix work and pleasure
+;; by coding research prototypes (in various languages, Clojure among them of course).
 ;; 
 ;; On my spare time I develop largely experimental free (as in freedom) software,
 ;; and for a few of them I do get some users which thus involves some maintenance.
 ;; 
 ;; You can reach me professionally at the following address:
-;; `frederic.peschanski@lip6.fr`.  I will be happy to answer
+;; <frederic.peschanski@lip6.fr>.  I will be happy to answer
 ;; but don't mind to much if it takes some time.
 ;;}
 

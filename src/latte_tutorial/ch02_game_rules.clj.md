@@ -1,6 +1,6 @@
 
 
-# Chapter 2: The rules of the game
+# The rules of the game
 
 We are now ready to begin our first mathematical development
 in LaTTe. This will be in a `ch02-game-rules` namespace whose
