@@ -822,14 +822,19 @@ my-and-intro
 ;; The meaning is obvious, if `A` holds then the disjunction `A` *or* `B` also holds, this is the left introduction.
 ;; And the right introduction can be applied if `B` holds. We can also use the *implicits* `or-intro-left` (resp. `or-intro-right`)
 ;; with which the types `B` (resp. `A`) are inferred.
-;;
+;; 
+;; 
+;; There are of course implicit variants of the rules.
 ;;}
 
 (doc p/or-intro-left)
 ;;{
 ;; ...
 ;; ```
-;; (or-intro-left left-term right-type)
+;; (or-intro-left proofA B)```
+;; 
+;; Left introduction for a disjunction `(or A B)`, with `proofA` a proof of `A`.
+;; ...
 ;; ```
 ;;}
 
@@ -837,7 +842,10 @@ my-and-intro
 ;;{
 ;; ...
 ;; ```
-;; (or-intro-right left-type right-term)
+;; (or-intro-right A proofB)```
+;; 
+;; Right introduction for a disjunction `(or A B)`, with `proofB` a proof of `B`.
+;; ...
 ;; ```
 ;;}
 
