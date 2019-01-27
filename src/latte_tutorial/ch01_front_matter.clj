@@ -3,30 +3,30 @@
 ;; # Introduction
 ;;}
 
-(ns latte-tutorial.ch00-front-matter)
+(ns latte-tutorial.ch01-front-matter)
 
 ;;{
 ;; This document is a tutorial introduction to the LaTTe proof assistant.
 ;; 
 ;; Here are the primary goals:
 ;; 
-;;   - a quick startup guide to LaTTe
-;;   - a pedagogical overview of its main features
-;;   - a first experiment with important proof rules
+;;   - a quick startup guide to LaTTe,
+;;   - a pedagogical overview of its main features,
+;;   - a first experiment with important proof rules.
 ;; 
 ;; The main non-goals are:
 ;; 
-;;   - a complete course about e.g. type theory or logic, or whatever
-;;   - an exhaustive manual for the proof assistant
-;;   - a maths lecture
+;;   - a complete course about e.g. type theory or logic, or whatever,
+;;   - an exhaustive manual for the proof assistant,
+;;   - a maths lecture.
 ;; 
 ;; So I'll go straight-to-the-point, often omitting (probably) important
 ;; aspects.
 ;; 
 ;; The tutorial is heavily inspired by [a talk about LaTTe](https://www.youtube.com/watch?v=5YTCY7wm0Nw)
 ;; that I gave at EuroClojure'2016. 
-;; LaTTe changed quite a bit since then, but it is still an
-;; interesting experience of "live coding mathematics".
+;; LaTTe changed quite a bit since then, but the video is still a
+;; good example of "live coding mathematics".
 ;; 
 ;; The source for this tutorial is a *literate programming* document, which means it is
 ;; both a textual document with Clojure (and LaTTe) code examples, and also
@@ -41,7 +41,7 @@
 ;;    text with all the source code.
 ;; 
 ;; For example, the following line is an expression of the Clojure language that
-;; can be evaluated directly when loading the code source view
+;; can be evaluated directly when loading the `.clj` source file:
 ;;}
 
 ((fn [x] x) 42)
@@ -64,8 +64,8 @@
 ;; I think it is good to introduce oneself when talking to other people.
 ;; 
 ;; My name is Frederic Peschanski, I am an associated professor in computer science
-;; at Sorbonne University in Paris, France. I do research mostly on the theoretical
-;; sides, but my main hobby is programming thus I try sometimes to mix work and pleasure
+;; at Sorbonne University in Paris, France. I do research mostly on theoretical
+;; things, but my main hobby is programming thus I try sometimes to mix work and pleasure
 ;; by coding research prototypes (in various languages, Clojure among them of course).
 ;; 
 ;; On my spare time I develop largely experimental free (as in freedom) software,
@@ -83,12 +83,14 @@
 ;; 
 ;; > **Type Theory and Formal Proof: an Introduction**.
 ;; >
-;; > Rob Nederpelt and Herman Geuvers
+;; > *Rob Nederpelt and Herman Geuvers*
 ;; >
 ;; > Cambridge University Press, 2012
 ;; 
-;; That's a heavily recommended lecture, but it's not a prerequisite
-;; for learning and using LaTTe (only a very nice complement).
+;; That's a heavily recommended lecture if you are interested in logic in general,
+;; and the $\lambda$-calculus in particular. It is also the best source of information
+;; the understand the underlying theory of LaTTe. However it is not a prerequisite
+;; for learning and using LaTTe.
 ;; 
 ;; I would also like to thank Yeonathan Sharvit and Hiram Madelaine as well as
 ;; the (few) contributors to LaTTE. And of course "big five" to the Clojure core
@@ -107,14 +109,16 @@
 ;; lambda-calculus. This will be explained, at least superficially, in the tutorial.
 ;; 
 ;; The basic activity of a proof assistant user is to:
+
+;;  - state "fundamental truths" as **axioms**,
 ;;  - write **definitions** of mathematical concepts (e.g. what it is to be a bijection)
-;;  - state properties about these concepts based on their definitions, in the form of **axioms** and (yet unproven) **theorems** (or lemmas)
-;;  - and for each theorem, help in writing a **formal proof** that it indeed holds
+;;  - state properties about these concepts based on their definition, in the form of **theorem** (or lemma) statements
+;;  - and for each theorem (or lemma) statement, assist in writing a **formal proof** that it is, indeed, a theorem.
 ;; 
 ;; So it's of no surprise that these are the main features of LaTTe.
 ;; But it is also a library for the Clojure programming language, which is unlike
 ;; many other proof assistants designed as standalone tools (one exception being the
-;; members of the HOL family, another important source of inspiration).
+;; members of the HOL family, as well as ACL2, both important sources of inspiration).
 ;; Thanks to the power of the Lisp language in general,
 ;; and its Clojure variant in particular, all the main features of the proof assistant
 ;; are usable directly in Clojure programs or at the REPL (Read-Eval-Print-Loop).
@@ -136,10 +140,10 @@
 ;; in general, there's not difference at all!
 ;; 
 ;; Last but not least, the main innovative feature of LaTTe is its *declarative proof language*,
-;; which makes the proofs follow the *natural deduction* style, which means that LaTTe proofs
-;; really look like standard mathematical proofs, at least strucutrally, and of course if you're
-;; able to cope with the Clojure-enhanced Lisp notation. There aren't just parentheses (but there's
-;; still a bunch of them).
+;; which makes the proofs follow the *natural deduction* style. The objective is to make LaTTe proofs
+;; quite similar to standard mathematical proofs, at least strucutrally. One still has to
+;; deal with the Clojure-enhanced Lisp notation, i.e. a perfectly non-ambiguous mathematical
+;; notation, only slightly remote from "main-stream" mathematics.
 ;; 
 ;;}
 
@@ -179,6 +183,13 @@
 ;; I don't want to give any specific recommendation since most of the introductory
 ;; books I've read are quite good ...
 ;; 
+;;}
+
+;;{
+;; ## License
+;; 
+;; This document source is copyright (C) 2018 Frédéric Peschanski
+;; distributed under the MIT License (cf. `LICENSE` file in the root directory).
 ;;}
 
 ;;{

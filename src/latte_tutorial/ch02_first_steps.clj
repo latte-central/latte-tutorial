@@ -2,7 +2,7 @@
 ;; # First steps
 ;;}
 
-(ns latte-tutorial.ch01-first-steps)
+(ns latte-tutorial.ch02-first-steps)
 
 ;;{
 ;; In this short chapter I will quickly explain how to
@@ -37,6 +37,7 @@
 ;; 
 ;; After some cleanup I get a `latte-tutorial/` root directory
 ;; with the following contents:
+;; 
 ;; - `project.clj` the leiningen project file
 ;; - `src/latte_tutorial/` the source files (`.clj` or `.clj.md` extensions)
 ;; - `LICENSE`, `README.md` some auxiliary files
@@ -67,6 +68,7 @@
 ;; The `:dependencies` key is most interesting.
 ;; We first require the Clojure implementation itself, of course.
 ;; And our LaTTe dependencies are as follows:
+;; 
 ;; - The core `latte` implementation, which provides the main user interface
 ;;   of the proof assistant. It itself depends on the `latte-kernel` project which
 ;;   implements the type theory used in LaTTe
@@ -93,9 +95,9 @@
 ;; we simply have to create a namespace source file with the `.clj` extension
 ;; and start coding.
 ;; 
-;; We will proceed to the file `src.latte_tutorial.ch02_game_rules.clj` corresponding
-;; to the namespace `latte-tutorial.ch02-game-rules` in which we'll start coding
+;; We will proceed to the file `src/latte_tutorial/ch03_game_rules.clj` corresponding
+;; to the namespace `latte-tutorial.ch03-game-rules` in which we'll start coding
 ;; mathematics.
 ;; 
-;; Please proceed ...
+;; Let's proceed ...
 ;;}

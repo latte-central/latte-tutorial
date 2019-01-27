@@ -3,13 +3,13 @@
 # The rules of the game
 
 We are now ready to begin our first mathematical development
-in LaTTe. This will be in a `ch02-game-rules` namespace whose
+in LaTTe. This will be in a `ch03-game-rules` namespace whose
 declaration is as follows:
 
 
 
 ```clojure
-(ns latte-tutorial.ch02-game-rules
+(ns latte-tutorial.ch03-game-rules
   ;; In this namespace we will only play with (lambda-)terms and types,
   ;; so we require only very few top-level forms from the `core` namespace.
   (:require [latte.core :refer [term type-of type-check?]]))
@@ -23,7 +23,7 @@ thing. It means that the requirements are satisfied.
 
 
 ## Lambda the ultimate
-;;
+
 One assumption I make is that you, the reader, you know the "pure" (i.e. untyped) lambda-calculus.
 This is not a very strong assumption because you can find it right at the core of you favorite
 programming language.  Indeed, in Clojure the `lambda` is called `fn`, which we use to define
@@ -48,7 +48,7 @@ This function can be applied to anything to yield the very *same* anything:
 
 ```
 
-We also show that the variables, e.g. `x`, `z`, can be renamed without changing
+We also see that the variables, e.g. `x`, `z`, can be renamed without changing
 the function, it's still the identity function (unless there's some clash in the renaming).
 In the set of useful functions, this is maybe the simplest of all and it even deserve
 a name in the standard Clojure library:
@@ -118,7 +118,7 @@ In the composition example above we did something rather unusual in Clojure:
 we described the type of functions using the notation `(==> T U)` with `T` the
 type of the input, and `U` the type of the returned value.
 
-As we'll quickly see, in a type theory the explicit mentioning of type becomes
+As we'll quickly see, in type theory the explicit mentioning of types becomes
 an essential part of the mathematical language. As I often say if I am not
 totally sold to the use of (static) types in programming (otherwise I would maybe
 not use Clojure for starters), I am totally sold to the use of types in logic
@@ -135,7 +135,7 @@ that we are not yet at the user-level of the proof assistant, we only play with 
 Thus our starting point is this:
 
 ```clojure
-;; The identity function in latte (initial version)
+;; The identity function in LaTTe (initial version)
 (term
   (λ [x] x))
  --> Unhandled clojure.lang.ExceptionInfo
@@ -153,6 +153,7 @@ As the exception raised by LaTTe makes clear, there is something missing in our 
 In fact we need to give an explicit type to the variable `x`, let's try with an arbitrary type named `A`:
 
 ```clojure
+;; The identity function in LaTTe (second version)
 (term
  (λ [x A] x))
  --> Unhandled clojure.lang.ExceptionInfo
@@ -176,9 +177,10 @@ this we will add an extra layer of abstraction to our λ.
 
 
 ```clojure
+;; ;; The identity function in LaTTe (third, correct version)
 (term
  (λ [A :type] (λ [x A] x)))
-;; => (λ [A ✳] (λ [x A] x))
+;; => (λ [A *] (λ [x A] x))
 
 ```
 
@@ -189,14 +191,17 @@ Hence in LaTTe the (type-)generic identity function first takes an arbitrary typ
 
 The value returned by the `term` form (technically a Clojure macro) is the internal
 representation of the terms in LaTTe. It's almost like what is written except that
-the type of types is written `✳` internally.
+the type of types is written `✳` internally. In fact I do not find any (high-quality)
+unicode font supporting this so I replaced the actual symbol `Eight Spoked Asterisk Emoji`
+(`U+2733`) by the "standard" asterisk `*`. I've made this choice so that we know
+when terms are internal vs. written by the user.
 Note also that if we use the ascii `lambda` we get the same result:
 
 
 ```clojure
 (term
  (lambda [A :type] (lambda [x A] x)))
-;; => (λ [A ✳] (λ [x A] x))
+;; => (λ [A *] (λ [x A] x))
 
 ```
 
@@ -208,10 +213,10 @@ section is no exception. Thus the question is: *what is the type of the followin
 ```clojure
 (λ [A :type] (λ [x A] x))
 ```
-The answer to this question is perhaps the most important feature of type theory,
+The answer to this question is perhaps the most important aspect of type theory,
 and in fact it is a very simple answer:
 
-> the type of λ (`lambda`) is ∀ (`forall`)
+> The type of λ (`lambda`) is ∀ (`forall`)
 
 You might read somewhere that it is a (kind of) product, but it's much simpler
 to relate *functions* (constructed with λ) and *universal quantifications*
@@ -239,11 +244,13 @@ Since `x` is supposed of type `A`, we should have:
 
 Hence:
 
+```clojure
 (type-of (λ [A :type] (λ [x A] x)))
 ≡ (∀ [A :type] (∀ [x A] A)) 
+```
 
-To try if LaTTe agrees with this, we can use the
-`type-check?` predicate of LaTTe.
+To see if LaTTe agrees with this, we can use the
+`type-check?` predicate.
 
 
 
@@ -275,7 +282,7 @@ keyboard, you can alternatively "type" the following
 
 ```
 
-## Curry Howard Part One: Propositions as Types
+## Curry Howard Take One: Propositions as Types
 
 We are now ready for the Curry Howard enlightenment, take one.
 If you have some level of mathematical background, then the ∀ symbol and its
@@ -290,7 +297,7 @@ Taken literally, the type:
 
 means something like:
 
-> for all `A` of type `:type`, and for all `x` of type `A`, then `A`
+> For all `A` of type `:type`, and for all `x` of type `A`, then `A`
 
 That's not very effective as a logical statement. But everything is *here*
 except it is not *that* apparent. To obtain a simpler reading (of the
@@ -306,13 +313,13 @@ and as a synonym in type theory:
 Moreover, remark that in the subterm `(∀ [x A] A)`
 the variable `x` remains *unusued* (technically we say that
 there is no free occurence of the variable `x` in the body
-of the quantified (which is `A` in our example).
+of the quantifier (which is `A` in our example).
 Informally, this is when the variable remains *"unused"*.
 
 When this is the case, we can use the following simplified notation:
 
-> In a term of the form `(∀ [x A] E)` with an arbitrary expression `e`
-> if there is no free occurrence of `x` in `e` then the term is the same as:
+> In a term of the form `(∀ [x A] E)` with an arbitrary type expression `E`
+> if there is no free occurrence of `x` in `E` then the term is the same as:
 > `(==> A E)`
 
 According to this rule, we thus have:
@@ -328,11 +335,11 @@ We can see directly in LaTTe that both notations are considered "the same":
 ```clojure
 (term
  (∀ [A :type] (∀ [x A] A)))
-;; => (Π [A ✳] (==> A A))
+;; => (Π [A *] (==> A A))
 
 (term
  (∀ [A :type] (==> A A)))
-;; => (Π [A ✳] (==> A A))
+;; => (Π [A *] (==> A A))
 
 ```
 
@@ -343,18 +350,18 @@ As a side note, we can see that our universal quantification was rewritten
 using the capital greek letter Pi (Π). This "new" quantifier is called a **product**
 and there are some reasons why this terminology is favored over universal quantification
 in many type theories. But in LaTTe at least there is no difference at all,
-and the reason we use Π rather than ∀ in the internal representation mostly
-relates to "historical filiation". Users are encouraged to use the usual
+and the reason we use Π rather than ∀ in the internal representation is like
+for the asterisk, and also by "historical filiation". Users are encouraged to use the usual
 mathematical notation for universal quantification.
 
 Hitherto we can propose a better logical meaning for the type of
 the identity function:
 
-> for all proposition (type) `A`, `A` implies `A`
+> For all proposition (as-type) `A`, `A` implies `A`
 
-This is when we interpret `(==> P Q)` as the implication that
-if `P` holds then also `Q` holds (but maybe not the converse).
-or the more concise logical property that **implication is reflexive**.
+Seen as a logical statement `(==> P Q)` is the implication saying that
+if `P` holds then also `Q` holds. Hence here, the logical statement
+is that logical **implication is reflexive**.
 
 Let's try to put the simplified notation into practice:
 
@@ -375,12 +382,13 @@ reflexive, nice!
 
 Also, the (non-obviously) equivalent computational interpretation is unsurprising:
 
-> for all type `A`, the identity function for this type takes an argument of type `A` and
+> For all type `A`, the identity function for this type takes an argument of type `A` and
 > returns a value of type `A` also
 
 Here we are at the heart of the Curry Howard correspondance.
 A lambda-abstraction (i.e. a single argument anonyous function) such as identity, has two complementary and in fact equivalent
 interpretations:
+
 1. a computational interpretation: the arrow type `(==> P Q)` saying that the function takes a value of type `P` as input, and outpus a value of type `Q`.
 2. a logical interpretation: the implication `(==> P Q)` saying that if `P` holds then so is `Q`. 
 
@@ -398,7 +406,7 @@ A LaTTe version of the composition function we wrote in Clojure is the following
     (λ [f (==> A B)]
        (λ [g (==> B C)]
           (λ [x A] (g (f x)))))))
-;; => (λ [A B C ✳] ... etc ...
+;; => (λ [A B C *] ... etc ...
 
 ```
 
@@ -406,7 +414,8 @@ A LaTTe version of the composition function we wrote in Clojure is the following
 is the same as `(λ [A :type] (λ [B :type] (λ [C :type] ...)`
 This is a common and useful notational facility (internal lambda's have only one argument).
 
-**Question**:
+**Questions**:
+
 - write the type of the term above  (the telescope notation is also avaiable
 for ∀). Check your answer with `type-check?`  (or *cheat* with what's come next but that's cheating!).
 - what is the logical interpretation of this type? Does it say something interesting about implication?
@@ -419,29 +428,31 @@ for ∀). Check your answer with `type-check?`  (or *cheat* with what's come nex
 
 So we saw terms, e.g. the (type-generic) identity function, and we saw types such as the reflexivity of implication.
 In most typed programming language there is a clear distinction between:
+
 - the terms that express the dynamics of the programs
 - their types that are checked statically at compile-time
 
 In LaTTe as in most type theories there is no such a strong distinction.
-- first types are *also* terms!
-- but many terms are *not* types.
+
+- first, types are *also* terms!
+- however many terms are *not* types.
 
 So how do we make the distinction now?
 The first and principal rule is the following:
 
-> only terms whose type is `:type`  (or ✳ internally) are actually called *types*
+> Only terms whose type is `:type`  (or `*` internally) are actually called *types*
 
 Thus, when we write `(λ [A :type] ...)` we explicitly say that `A` is indeed a type, since it is of type `:type`.
 
-The term `:type` (equivalently ✳) is thus called *"the type of types"*.
+The term `:type` (equivalently `*`) is thus called *"the type of types"*.
 
 But we might wonder if `:type` has itself a type, and in this case what would be this *"type of the type of types*" (sic!).
 In some old type theories, the type of `:type` was `:type` itself... And in fact it was shown at a much later time that this
 cyclic definition yields an inconsistent theory: a paradox similar to the problematic notion of
 a set potentially containing itself.
 
-In modern type theories, an unbounded hierarchy of universe levels are introduced.
-The type of types is called the universe of lavel 0. The type of the universe 0 is universe 1, etc.
+It is common in modern type theories to introduce an unbounded hierarchy of universe levels.
+The type of types is called the universe of level 0. The type of the universe 0 is universe 1, etc.
 However this is in the case of LaTTe too much a complex solution to the problem at hand.
 
 So we are back to the question: what is the type of `:type`, if any?
@@ -455,14 +466,14 @@ As it happen, we can ask LaTTe directly, and this is how we ask:
 
 ```
 
-The type of a star (✳) is thus a square (□)!
-Well, we know that ✳ is `:type`, the type of all "actual" types. Since the type of `:type` cannot be
+The type of a star (`*`) is thus a square (`□`)!
+Well, we know that `✳` is `:type`, the type of all "actual" types. Since the type of `:type` cannot be
 `:type` (for the sake of logical consistency) it is not an "actual" type and is thus called *a sort*.
 So we have the rule:
 
 > The type of all types is **the sort** `:type`
 
-The term represented as a square □ is also a sort, and it is called `:kind`. So we have:
+The term represented as a square `□` is also a sort, and it is called `:kind`. So we have:
 
 > The type of the sort `:type` is the sort `:kind`
 
@@ -482,7 +493,7 @@ But at least the message is clear:
 
 > The sort `:kind` has no type!
 
-In fact `:kind` (or □) is the *only* term in LaTTe that has no type.
+In fact `:kind` (or `□`) is the *only* term in LaTTe that has no type.
 This is thanks to this "escape hatch" that we avoid the inconsistency of
 cyclic definitions, and the complexity of universe levels.
 
@@ -491,7 +502,7 @@ a very simple type theory, much simpler than the ones found in most
 other proof assistants. And unlike most proof assistants, the simple
 type theory used in LaTTe offers a decisive and distinguishing feature
 
-> it is decidable, and quite efficient, to compute the type of an arbitrary (well-formed) term
+> It is decidable, and quite efficient, to compute the type of an arbitrary (well-formed) term
 
 This is what the `type-of` form allows us to do: ask the type of a term.
 Let's try on the identity function:
@@ -499,7 +510,7 @@ Let's try on the identity function:
 
 ```clojure
 (type-of (λ [A :type] (λ [x A] x)))
-;; => (Π [A ✳] (==> A A))
+;; => (Π [A *] (==> A A))
 
 ```
 
@@ -508,7 +519,7 @@ The returned value should be a type then, so let's check this:
 
 ```clojure
 (type-of (Π [A ✳] (==> A A)))
-;; => ✳
+;; => *
 
 ```
 
@@ -522,11 +533,11 @@ see at a later stage that it's quite a useful component of our logical toolbox.
 
 
 
-## Curry Howard Part Two: Programs as Proofs
+## Curry Howard Take Two: Programs as Proofs
 
 We are now ready for the Curry Howard enlightenment, take two.
 
-With what we learn in the previous sections, we are now able to build implications
+With what we learned in the previous sections, we are now able to build implications
 and universal quantifications using lambda's, but we are missing one important piece
 of the puzzle: a way to *use* an implication or universal quantification to perform a *deduction*.
 
@@ -544,28 +555,29 @@ This proposition, which is undoubtedly among the most important rules of logic, 
 ```
 
 Note that the outermost implication is used here as a kind of "trailed" conjunction: if we *first*
-have `(==> A B)` and *then* we have `A`, then we can deduce `B`.
+have `(==> A B)` and *then* we have `A`, *ultimately* we can deduce `B`.
 
 In the next chapter we will define the more traditional conjunction (`and`) operator, but in type theory
 the "trailed" implication is used most of the time since it is primitive.
 
-According to natural deduction (and logical reasoning indeed), the proposition above should be *true*.
-This could be a basic law of our logic, which would make the proposition true *philosophically*.
-But if philosophical truth is OK, mathematical proof is best!
-
-The question thus becomes: *what is a proof?*
+According to natural deduction (and logical reasoning indeed), the *modus ponens* rule should be *true*.
+This could be a basic law of our logic, thus *modus ponens* would be true *philosophically*
+(more precisely, *axiomatically*).
+But if philosophical truth is OK, mathematical proof is best! The question thus becomes: *what is a proof?*
 If in philosophy and "everyday" mathematics this question can bring us quite far, once again type theory
-offers a very simple and "natural" answer: a *proof* is simply a *program* expressed as a lambda-term.
+offers a very simple and "natural" answer: a *proof* is simply a *program* expressed as a lambda-term,
+and whose type is the theorem we want to prove.
 This is the programs-as-proofs part of the Curry-Howard correspondance.
 
 In LaTTe, this means that in order to prove a proposition $P$, we have to find a term $t$ whose type
 is $P$. Note that we are not trying to find a particular program/term $t$ but *any* term $t$ whose type
-is $P$ will do. This notion of *proof irrelevance* makes proving with programs slightly different from
+is $P$ will do. This aspect, named *proof irrelevance*, makes proving with programs
+slightly different from
 programming *per se*. However some proofs are more elegant than others, more efficient (i.e. smaller) than
 others, etc. So this is not totally unlike programming when before reaching for an efficient solution,
 one often begins with a naive solution.
 
-Going back to our *modus ponens* proposition, we are thus trying to fill the star symbol below with:
+Going back to our *modus ponens* proposition, we are thus trying to fill the star symbol below with
 an adequate term:
 
 
@@ -582,8 +594,8 @@ an adequate term:
 ```
 
 To avoid having to many nested lambda's, we introduce a *context*  (akin to a lexical environment
-in programming terms) composed of two arbitrary variables: `A` and `B` both of type `types`, hence
-arbitrary propositions/types. We could have introduced then using universal quantifiers but we would
+in programming terms) composed of two arbitrary variables: `A` and `B` both of type `:type`, hence
+arbitrary propositions. We could have introduced them using universal quantifiers but we would
 have lost the core of what we want to prove. Similarly in Clojure we write:
 
 ```clojure
@@ -594,17 +606,15 @@ rather than:
 (def myfun (fn [A] (fn [B] ...)))
 ```
 
-It is a good exercise to make the `type-check?' form above returns `true` but it is our first formal proof so let's
-do it together.
+Let's go back to our `type-check?` exercise. We know that an implication is built
+using a lambda abstraction, i.e.:
 
-We know by now (it's in our knowhow) that an implication is build using a lambda abstraction, i.e.:
-
-> a type of the form `(==> X Y)` is built using a term of the form `(λ [v X] e)`
+> A type of the form `(==> X Y)` is built using a term of the form `(λ [v X] e)`
 > with  `e` a term of type `Y`,  which in most cases must use the variable `v` declared of type `X`.
 
 Our implication has three members so this becomes:
 
-> a type of the form `(==> X Y Z)` is built using a term of the form `(λ [v X] (λ [w Y] e))`
+> A type of the form `(==> X Y Z)` is built using a term of the form `(λ [v X] (λ [w Y] e))`
 > with  `e` a term of type `Z`, using the variable `v` declared of type `X`, and `w` of type `Y`.
 
 The inner implication `(==> A B)` resembles a *function type*: a function from type `A` to type `B`.
@@ -617,7 +627,7 @@ Hence we could use something of the form:
       ? ;; should be of type B
 ))
 ```
-Let's think in terms of programs now. We have a function `f` from `A` to `B` and a variable `x` of type A`.
+Let's think in terms of programs now. We have a function `f` from `A` to `B` and a variable `x` of type `A`.
 Applying `f` to `x`, hence `(f x)`, should produce a value of type `B`, exactly what we need.
 Let's try this!
 
@@ -641,6 +651,7 @@ We just wrote a formal proof of the *modus ponens*, and it was like a very
 basic typed functional program!
 
 An very important take away is the tight relation between:
+
 - *computation* with function application on the one side, and
 - *logic* on the other side, with *modus ponens* a.k.a. deduction.
 
@@ -739,12 +750,12 @@ theorem in type theory and LaTTe.
 1. the type of a lambda-abstraction is a universal quantification
 2. if the universally quantified variable is unused, then we have a logical implication, which is *also* an arrow type from the computational point of view
 3. function application is instantiation of universal quantification, it is *also* logical deduction in the case of implication
-4. types are propositions (a.k.a. Curry Howard part one)
-5. programs are proofs (a.k.a. Curry Howard part two)
+4. types are propositions (a.k.a. Curry Howard take one)
+5. programs are proofs (a.k.a. Curry Howard take two)
 6. the type of `:type` is the sort `:kind`, and kind is the only term without a type 
 
 These are the basic rules, but we are still far from being able to do actual
-mathematical developments using only these basic rules. Indeed, directly writing lamda-terms
+mathematical developments using only these. Indeed, directly writing lamda-terms
 to prove mathematical statements quickly becomes cumbersome and too far away from the
 way proofs are generally expressed in mathematics. Moreover, we need higher level
 abstractions, so in the next chapter we will meet the actual LaTTe proof assistant.

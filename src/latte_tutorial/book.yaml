@@ -6,7 +6,7 @@ author: 'Frédéric Peschanski (fredokun)'
 
 documentclass: 'report'
 papersize: 'a4'
-romanfont: "Lato"
+romanfont: "STIX"
 monofont: "DejaVu Sans Mono"
 geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm"
 fontsize: 12pt
