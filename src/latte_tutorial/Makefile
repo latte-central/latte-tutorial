@@ -13,7 +13,7 @@ PANDOC_FLAGS = -s --toc --pdf-engine=xelatex --metadata-file=book.yaml --highlig
 
 HEADER = header.md
 
-OBJS = ch00_front_matter.clj.md ch01_first_steps.clj.md ch02_game_rules.clj.md ch03_logic_bits.clj.md
+OBJS = ch01_front_matter.clj.md ch02_first_steps.clj.md ch03_game_rules.clj.md ch04_logic_bits.clj.md
 
 all: markdownize
 
