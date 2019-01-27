@@ -8,7 +8,7 @@ do some actual logic.
 
 
 ```clojure
-(ns latte-tutorial.ch03-logic-bits
+(ns latte-tutorial.ch04-logic-bits
   ;; In this namespace we will start to use LaTTe "for real",
   ;; so we introduce the main forms from the core namespace
   (:require [latte.core :as latte :refer [definition defthm deflemma example try-example
@@ -28,11 +28,13 @@ do some actual logic.
 
 [Natural deduction](https://en.wikipedia.org/wiki/Natural_deduction)
 is, very roughly, a way of presenting and formalizing logics based on:
+
 - introduction rules, or how to construct logical statements
 - elimination rules, or how to take them apart.
 
 We already encountered introduction and elimination rules that
 are in a way primitive in type theory and LaTTe:
+
 - the introduction of a universal quantifier - or an implication
 as a special case - using a lambda abstraction
 - the elimination of a universal quantifier or an implication
@@ -99,7 +101,7 @@ documentation:
 
 
 ```
-latte-tutorial.ch03-logic-bits/my-and
+latte-tutorial.ch04-logic-bits/my-and
 ([[A :type] [B :type]])
   
 (forall [C :type] (==> (==> A B C) C))
@@ -170,7 +172,7 @@ my-and-intro
 ;;       :arity 2,
 ;;       :type (Π [⇧ A]
 ;;                (Π [⇧ B]
-;;                   (#'latte-tutorial.ch03-logic-bits/my-and A B))),
+;;                   (#'latte-tutorial.ch04-logic-bits/my-and A B))),
 ;;       :proof nil}
 
 ```
