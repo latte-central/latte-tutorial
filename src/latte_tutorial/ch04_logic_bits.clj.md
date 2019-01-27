@@ -50,7 +50,7 @@ of the [latte-prelude](https://github.com/latte-central/latte-prelude) library.
 
 ## Conjunction
 
-Conjunction, or logical `and` is where most presentations of natural
+Conjunction, or logical `and`, is where most presentations of natural
 deduction start, so let's follow the tradition.
 
 The definition is provided in the prelude:
@@ -100,14 +100,14 @@ documentation:
 ```
 
 
-```
-latte-tutorial.ch04-logic-bits/my-and
-([[A :type] [B :type]])
-  
-(forall [C :type] (==> (==> A B C) C))
-```
-
-**Definition**: logical conjunction, a remake.
+> ```
+> latte-tutorial.ch04-logic-bits/my-and
+> ([[A :type] [B :type]])
+>   
+> (forall [C :type] (==> (==> A B C) C))
+> ```
+> 
+> **Definition**: logical conjunction, a remake.
 
 
 
@@ -136,7 +136,7 @@ is often presented as follows:
 
 The horizontal "double bar" means implication, thus this reads as follows:
 
-> if both proposition `A` and `B` hold, then we can deduce
+> If both proposition `A` and `B` hold, then we can deduce
 > that the conjunction `(and A B)` also holds.
 
 This is often introduced in an axiomatic way, i.e. without any justification,
@@ -982,8 +982,110 @@ An elimination rule that takes a proof
 a proof `left-proof` of type `(==> A prop)`, 
 a proof `right-proof` of type `(==> B prop)`, and thus
 concludes that `prop` holds by `or-elim-thm`.
+;;
+As an illustration, let's prove the following theorem:
 
 
+```clojure
+(defthm my-or-assoc
+  "Associativity of disjunction"
+  [[A :type] [B :type] [C :type]]
+  (==> (or A (or B C))
+       (or (or A B) C)))
+
+```
+
+This is an expected property of disjunction: associativity.
+Our assumption is `(or A (or B C))`, thus a disjunction and the
+rule `or-elim` gives the proof-by-case scheme we should follows:
+;;
+- the first case is for the assumption of `A` alone,
+- the second case is for assumption `(or B C)`
+;;
+If in both cases we can reach the conclusion, then we'll have
+a proof of the theorem... Let's try this...
+
+
+```clojure
+(try-proof 'my-or-assoc
+  (assume [H (or A (or B C))]
+    "First case, we assume `A`."
+    (assume [H1 A]
+      (have <a1> (or A B) :by (p/or-intro-left H1 B))
+      "We reach our first goal below."
+      (have <a> (or (or A B) C) :by (p/or-intro-left <a1> C)))
+    "Second case, we assume `(or B C)`"
+    (assume [H2 (or B C)]
+      "...")))
+;; => [:failed my-or-assoc {:msg "Proof incomplete."}]
+
+```
+
+The second case is a little more complex. Our goal is to
+prove the following, expressed as a lemma:
+
+
+```clojure
+(deflemma my-or-assoc-aux
+  [[A :type] [B :type] [C :type]]
+  (==> (or B C)
+       (or (or A B) C)))
+
+(proof 'my-or-assoc-aux
+  (assume [H (or B C)]
+    "First case: assuming `B`"
+    (assume [H1 B]
+      (have <a1> (or A B) :by (p/or-intro-right A H1))
+      "Ok, we reach the goal"
+      (have <a> (or (or A B) C) :by (p/or-intro-left <a1> C)))
+    "Seconde case: assuming `C`"
+    (assume [H2 C]
+      "This is immediate."
+      (have <b> (or (or A B) C) :by (p/or-intro-right (or A B) H2)))
+    "We can now use the or-elimination"
+    (have <c> _ :by (p/or-elim H ; this is the disjunction to eliminate
+                               (or (or A B) C) ; and this is ou goal
+                               <a> ; proof of the first case
+                               <b> ; proof of the second case
+                               )))
+  "We can conclude"
+  (qed <c>))
+;; => [:qed my-or-assoc-aux]
+
+```
+
+At proof step `<c>`, what we want to "have" is `(or (or A B) C)` and
+we us the `or-elim` rule to obtain this. The reason we use the
+underscode placeholder `_` is that the type we expect is already the
+second argument or `or-elim` so there is nothing to gain to
+repeat it. The `or-elim` is one of the rare occasion when using
+the underscode is actually useful in `have` steps.
+;;
+Now that we demonstrated our Lemma, we can finish the proof for
+our main theorem.
+
+
+```clojure
+(proof 'my-or-assoc
+  (assume [H (or A (or B C))]
+    "First case, we assume `A`."
+    (assume [H1 A]
+      (have <a1> (or A B) :by (p/or-intro-left H1 B))
+      "We reach our first goal below."
+      (have <a> (or (or A B) C) :by (p/or-intro-left <a1> C)))
+    "Second case, we assume `(or B C)`"
+    (assume [H2 (or B C)]
+      (have <b> (or (or A B) C) :by ((my-or-assoc-aux A B C) H2)))
+    "We eliminate the disjunction."
+    (have <c> _ :by (p/or-elim H (or (or A B) C) <a> <b>)))
+  (qed <c>))
+;; => [:qed my-or-assoc]
+
+```
+
+Tadaaa! We did it, we reused an auxiliary lemma to prove a main theorem.
+And we also used the elimination rule for disjunction twice-in-a-row,
+I think we should be satisfied somehow.
 
 
 
