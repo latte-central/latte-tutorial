@@ -10,11 +10,12 @@
 (ns latte-tutorial.ch04-logic-bits
   ;; In this namespace we will start to use LaTTe "for real",
   ;; so we introduce the main forms from the core namespace
-  (:require [latte.core :as latte :refer [definition defthm deflemma example try-example
+  (:require [latte.core :as latte :refer [definition defthm deflemma
+                                          example try-example
                                           proof try-proof
                                           assume have qed]]
             ;; we will also exploit the basic proposition from the prelude
-            [latte-prelude.prop :as p :refer [and or not <=>]]
+            [latte-prelude.prop :as p :refer [and and* or or* not <=>]]
 
             ;; we will also use the documentation
             [clojure.repl :refer [doc]])
@@ -203,7 +204,7 @@ my-and-intro
 ;; We already know how to write a proof term, so let's first demonstrate the first possibility.
 ;; To prove a theorem in LaTTe, we have to use the `proof` function (it is not a macro because it doesn't have to be), which expects arguments of the following form:
 ;; 
-;;
+;; 
 ;; ```clojure
 ;; (proof '<theorem-name>
 ;;    <proof-script>)
@@ -807,7 +808,7 @@ my-and-intro
 ;; Instead of reconstructing things like we did with conjunction, we will
 ;; directly use the introduction and elimination for disjunction (logical *or*)
 ;; as they are defined in the prelude, and not redefine them (it is a good exercise).
-;;
+;; 
 ;; There are two introduction rules and one elimination rule for `or`, which is exactly
 ;; the opposite of conjunction. The introduction rules are as follows:
 ;; 
@@ -982,7 +983,7 @@ my-and-intro
 ;; second argument or `or-elim` so there is nothing to gain to
 ;; repeat it. The `or-elim` is one of the rare occasion when using
 ;; the underscode is actually useful in `have` steps.
-;;
+;; 
 ;; Now that we demonstrated our Lemma, we can finish the proof for
 ;; our main theorem.
 ;;}
@@ -1010,10 +1011,47 @@ my-and-intro
 
 ;;{
 ;; **Exercise**: state and prove the following:
-;;
+;; 
 ;; - Under the assumption `(or A A)` prove `A`  (for an arbitrary proposition `A`)
 ;; - From `(or A B)` prove `(or B A)`
 ;;}
+
+;;{
+;; ### Proof by "many" cases
+;; 
+;; There is also an n-ary variant `or*` for disjunction. There is only ones
+;; generic introduction rule, as illustrated in the following examples:
+;;}
+
+(example [[A :type] [B :type] [C :type] [D :type]]
+    (==> B (or* A B C D))
+  (qed (lambda [x B] (p/or-intro* A x C D))))
+;; => [:checked :example]
+
+(example [[A :type] [B :type] [C :type] [D :type]]
+    (==> D (or* A B C D))
+  (qed (lambda [x D] (p/or-intro* A B C x))))
+;; => [:checked :example]
+
+;;{
+;; The elimination rules enables to make a proof with more than two cases,
+;; without having to nest multiple occurrences of `or-elim`. 
+;;}
+
+(example [[A :type] [B :type] [C :type] [D :type] [E :type]]
+    (==> (or* A B C D)
+         (==> A E)
+         (==> B E)
+         (==> C E)
+         (==> D E)
+         E)
+  (assume [Hor _ HA _ HB _ HC _ HD _]
+    (have <a> _ :by (p/or-elim* Hor ;; the or* term
+                                E ;; our goal
+                                HA HB HC HD ;; the 4 cases
+                                )))
+  (qed <a>))
+;; => [:checked :example]
 
 ;;{
 ;; ## Proving by contradiction
@@ -1087,11 +1125,59 @@ my-and-intro
 ;;   [[A :type]]
 ;;  (==> A absurd))
 ;; ```
-;; 
+;; Let's put this definition in practice. One basic principle of logic is that
+;; nothing can be *at the same* true and false, thus the following should hold:
 ;;}
 
+(defthm not-and
+  [[A :type]]
+  (not (and A (not A))))
 
+;;{
+;; Note that the statement can be rewritten `(==> (and A (not A)) p/absurd)`.
+;;}
 
+(proof 'not-and
+  "We first restate the hypothesis."
+  (assume [H (and A (not A))]
+    "First, we have `A` by assumption."
+    (have <a> A :by (p/and-elim-left H))
+    "Now, we can 'feed' it to `(not A)`"
+    (have <b> p/absurd :by ((p/and-elim-right H) <a>)))
+  "this is absurd!"
+  (qed <b>))
+;; => [:qed not-and]
 
+;;{
+;; 
+;; We will see other proofs by contradiction in the rest of the tutorial.
+;; 
+;; **Exercise**: prove the following theorem about "double negation".
+;;}
+
+(defthm my-impl-not-not
+  [[A :type]]
+  (==> A (not (not A))))
+
+;;{
+;; What about the converse? Can you prove it?
+;;}
+
+;;{
+;; ## Natural logic, in summary
+;; 
+;; In this chapter, we discussed the following topics.
+;; 
+;; - Natural logic is based on introduction and elimination rules,
+;; - The implication and universal quantification are primitive in type theory in LaTTe.
+;; They are introduced with `lambda` and eliminated with function application.
+;; - Conjunction (logical `and`) is a derived principles, with rules `and-intro`, `and-elim-left` and `and-elim-righ` (also the n-ary variants `and*` etc.).
+;; - Logical equivalence is a conjunction of two implications, thus ultimately a conjunction. 
+;; - Disjunction (logical `or`) is also a derived principle. The rules are `or-intro-left`, `or-intro-right` and `or-elim`. The elimination rule implements the important principle of *proof by case*. For more than two cases, you may use `or*`, `or-intro*` and `or-elim*`.
+;; - Negation (logical `not`) is derived from absurdity, and from absurdity one can prove everything. This enables *proofs by contradiction* in LaTTe.
+;;
+;; Now that we have a fairly complete logic, we will start to see how to do more traditional mathematics
+;; in LaTTe, starting with *set theory*.
+;;}
 
 
