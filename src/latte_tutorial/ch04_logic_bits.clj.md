@@ -656,17 +656,17 @@ Let's see their documentation:
 (doc p/and-intro)
 ```
 
-```
-latte-prelude.prop/and-intro
- 
-(and-intro a b)
-```
-
-An introduction rule that takes a proof
-`a` of type `A`, a proof `b` of type `B` and yields
-a proof of type `(and A B)`.
-
-This is an implicit version of [[and-intro-thm]].
+> ```
+> latte-prelude.prop/and-intro
+>  
+> (and-intro a b)
+> ```
+> 
+> An introduction rule that takes a proof
+> `a` of type `A`, a proof `b` of type `B` and yields
+> a proof of type `(and A B)`.
+> 
+> This is an implicit version of [[and-intro-thm]].
 
 
 
@@ -674,16 +674,16 @@ This is an implicit version of [[and-intro-thm]].
 (doc p/and-elim-left)
 ```
 
-```
-latte-prelude.prop/and-elim-left
-  
-(and-elim-left and-term)
-```
-
-An implicit elimination rule that takes a proof
-of type `(and A B)` and yields a proof of `A`.
-
-This is an implicit version of [[and-elim-left-thm]].
+> ```
+> latte-prelude.prop/and-elim-left
+>   
+> (and-elim-left and-term)
+> ```
+> 
+> An implicit elimination rule that takes a proof
+> of type `(and A B)` and yields a proof of `A`.
+> 
+> This is an implicit version of [[and-elim-left-thm]].
 
 
 
@@ -692,16 +692,16 @@ This is an implicit version of [[and-elim-left-thm]].
 ```
 
 
-```
-latte-prelude.prop/and-elim-right
-  
-(and-elim-right and-term)
-```
-
-An implicit elimination rule that takes a proof
-of type `(and A B)` and yields a proof of `B`.
-
-This is an implicit version of [[and-elim-right-thm]].
+> ```
+> latte-prelude.prop/and-elim-right
+>   
+> (and-elim-right and-term)
+> ```
+> 
+> An implicit elimination rule that takes a proof
+> of type `(and A B)` and yields a proof of `B`.
+> 
+> This is an implicit version of [[and-elim-right-thm]].
 
 
 
@@ -722,8 +722,8 @@ Our proof then is simplified as follows.
 
 ```
 
-### Nary variants
-;;
+### N-ary variants
+
 The conjunction is LaTTe is a binary operator, like it is always the case
 in mathematical logics. However as Lispers we know the interest of n-ary
 associative operators. While we cannot do so at the primitive level,
@@ -760,16 +760,17 @@ the prelude handles such cases, as illustrated by the following examples.
 ```
 
 An important advice is to avoid mixing the binary and nary constructs:
- - use `and-intro`, `and-elim-left` and `and-elim-r ight` with binary conjunction `and`
- - use `and-intro*` and `and-elim*` with the nary variant `and*`
+
+ - use `and-intro`, `and-elim-left` and `and-elim-r ight` with binary conjunction: `and`
+ - use `and-intro*` and `and-elim*` with the nary variant: `and*`
 
 
 
 ### Equivalence = conjunction of implications
-;;
+
 An important construct of logic is the equivalence of two propositions,
 which is defined as follows in the prelude:
-;;
+
 ```clojure
 (definition <=>
   "Logical equivalence or 'if and only if'."
@@ -893,32 +894,27 @@ There are of course implicit variants of the rules.
 (doc p/or-intro-left)
 ```
 
-...
-```
-(or-intro-left proofA B)```
-
-Left introduction for a disjunction `(or A B)`, with `proofA` a proof of `A`.
-...
-```
+> ```
+> (or-intro-left proofA B)```
+> 
+> Left introduction for a disjunction `(or A B)`, with `proofA` a proof of `A`.
+> ```
 
 
 ```clojure
 (doc p/or-intro-right)
 ```
 
-...
-```
-(or-intro-right A proofB)```
+> ```
+> (or-intro-right A proofB)```
+> 
+> Right introduction for a disjunction `(or A B)`, with `proofB` a proof of `B`.
+> ```
 
-Right introduction for a disjunction `(or A B)`, with `proofB` a proof of `B`.
-...
-```
+As an illustration, if you know that both `A` and `B` holds, then there are two ways to prove that either of them holds.
 
 
 ```clojure
-;; As an illustration, if you know that both `A` and `B` holds, then there are two ways to prove that either of them holds.
-;;}
-
 (example [[A :type] [B :type]]
     (==> (and A B)
          (or A B))
@@ -926,7 +922,8 @@ Right introduction for a disjunction `(or A B)`, with `proofB` a proof of `B`.
   (assume [H (and A B)]
     (have <a> A :by (p/and-elim-left H))
     "We have A thus we can introduce (or A B) from the left"
-    (have <b> (or A B) :by (p/or-intro-left <a> B))) ;; a.k.a. ((p/or-intro-left-thm A B) <a>)))
+    (have <b> (or A B) :by (p/or-intro-left <a> B)))
+                           ;; a.k.a. ((p/or-intro-left-thm A B) <a>)))
   (qed <b>))
 ;; => [:checked :example]
 
@@ -937,7 +934,8 @@ Right introduction for a disjunction `(or A B)`, with `proofB` a proof of `B`.
   (assume [H (and A B)]
     (have <a> B :by (p/and-elim-right H))
     "We have B thus we can introduce (or A B) from the right"
-    (have <b> (or A B) :by (p/or-intro-right A <a>))) ;; a.k.a. ((p/or-intro-right-thm A B) <a>)))
+    (have <b> (or A B) :by (p/or-intro-right A <a>)))
+                           ;; a.k.a. ((p/or-intro-right-thm A B) <a>)))
   (qed <b>))
 ;; => [:checked :example]
 
@@ -956,7 +954,6 @@ a very general *proof-by-case* scheme.
               C))))
 ```
 
-;;{
 Its informal reading is as follows. If you know that either the proposition `A` or the proposition `B` holds
 (it is not exclusive: `A` and `B` may be true also, but then it is either to use this fact), then suppose
 your goal is to prove some proposition `C`. Then you have two things to do to demonstrate that `C` holds:
@@ -972,17 +969,16 @@ There is of course an implicit version `or-elim` which is the one we will use in
 (doc p/or-elim)
 ```
 
-...
-```
-(or-elim or-term prop left-proof right-proof)
-```
+> ```
+> (or-elim or-term prop left-proof right-proof)
+> ```
+> 
+> An elimination rule that takes a proof
+> `or-term` of type `(or A B)`, a proposition `prop`,
+> a proof `left-proof` of type `(==> A prop)`, 
+> a proof `right-proof` of type `(==> B prop)`, and thus
+> concludes that `prop` holds by `or-elim-thm`.
 
-An elimination rule that takes a proof
-`or-term` of type `(or A B)`, a proposition `prop`,
-a proof `left-proof` of type `(==> A prop)`, 
-a proof `right-proof` of type `(==> B prop)`, and thus
-concludes that `prop` holds by `or-elim-thm`.
-;;
 As an illustration, let's prove the following theorem:
 
 
@@ -998,10 +994,10 @@ As an illustration, let's prove the following theorem:
 This is an expected property of disjunction: associativity.
 Our assumption is `(or A (or B C))`, thus a disjunction and the
 rule `or-elim` gives the proof-by-case scheme we should follows:
-;;
+
 - the first case is for the assumption of `A` alone,
 - the second case is for assumption `(or B C)`
-;;
+
 If in both cases we can reach the conclusion, then we'll have
 a proof of the theorem... Let's try this...
 
@@ -1089,9 +1085,87 @@ I think we should be satisfied somehow.
 
 
 
+**Exercise**: state and prove the following:
+;;
+- Under the assumption `(or A A)` prove `A`  (for an arbitrary proposition `A`)
+- From `(or A B)` prove `(or B A)`
+
+
+
 ## Proving by contradiction
 
-(TODO)
+It is not because we are doing *logic* that we should *absurdity* at all cost.
+It is in fact definable in type theory, and in LaTTe it is as follows:
+
+```clojure
+(definition absurd
+  "Absurdity."
+  []
+  (forall [α :type] α))
+```
+
+If read litteraly, this definition means *everything is provable*.
+It is thankfully safe to *define* such a concept, what would be dramatic
+would be if we could prove it as a theorem. Of course, without introducing
+an axiom (and trusting type theory and its implementation in LaTTe), it
+is not possible to find a proof of `absurd`.
+We might wonder, then, what is the interest of writing such an "absurd"
+formal definition!
+The first element of answer is the following incursion of the venerable
+latin language:
+
+```clojure
+(defthm ex-falso
+ "Ex falso sequitur quodlibet
+  (proof by contradiction, elimination for absurdity)."
+ [[A :type]]
+ (==> absurd A))
+```
+
+This theorem statement is the definition of *a proof by contradiction*.
+One of the most frequent "fake news" about intuitionistic logic
+(and constructive mathematics) is that it would not be possible to
+make such a proof by contradiction, everything should be "true", and
+classical reasoning is required to reason about "false" things.
+Of course this is totally incorrect. We can as an illustration demonstrate
+the *ex-falso* proof principle:
+
+
+```clojure
+(try-example [[A :type]]
+    (==> p/absurd A)
+  ;; the proof of absurdity
+  (assume [H p/absurd]
+    (have <a> A :by (H A)))
+  (qed <a>))
+;; => [:checked :example]
+
+```
+
+
+The proof principle available only in classical logic is the *principle
+of the exluded middle*, the fact that a proposition can only be
+true or false. So one can reason that something is true because it "cannot"
+be false. In intuitionistic logic, one must show *how* something
+is true or false. We will go back to this discussion in a later chapter
+but for now just remember that *proof by contradiction* is a different matter. 
+
+In terms of reasoning, the *ex-falso* principle is important. It says that
+when an assumption is *contradictory*, then it is by showing that absurd
+is derivable from it. If we manage to do so, then the `ex-falso` theorem
+allows to prove the expected conclusion.
+
+Before making some trivial examples of proofs by contradiction, the last
+piece of the puzzle is the operator of logical negation. In type theory
+it is defined from the absurdity, and in LaTTe it is the following:
+
+```clojure
+(definition not
+  "Logical negation."
+  [[A :type]]
+ (==> A absurd))
+```
+
 
 
 
