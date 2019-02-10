@@ -17,7 +17,7 @@
 ;; Can't children select their prefered ice cream flavour in type theory? 
 ;;}
 
-(ns latte-tutorial.ch05-set-thoery
+(ns latte-tutorial.ch05-set-theory
   (:require [latte.core :as latte :refer [definition defthm deflemma
                                           example try-example
                                           proof try-proof
@@ -26,7 +26,7 @@
             [clojure.repl :refer [doc]]
             
             ;; set theory requirements
-            [latte-sets.core :as set :refer [set elem subset seteq]]
+            [latte-sets.core :as set :refer [set elem set-of subset seteq]]
             )
 
   
@@ -284,3 +284,41 @@ the two previous steps"
 ;; and compare it with other "competing" notions.
 ;;}
 
+;;{
+;; # Boolean algebra of sets
+;;
+;; One major contribution of *George Boole* was its discovery (and study) of the
+;; relation between algebra (at that time, mostly developed for numbers) and
+;; logic. There is for example a simple correspondance between calculating
+;; in base 2 arithmetics, and propositional logic. `True` is 1, `False` is 0,
+;; `and` is `times`, `or` is `plus`, etc.
+;;
+;; Important algebraic properties follow the correspondance: `False` is a
+;; unit of disjunction and "absorbing" for conjunection, `True` is simply
+;; the converse. There are also specific laws such as *De Morgan*'s:
+;;
+;; - `(not (or P Q))` ≡ `(and (not P) (not Q))`
+;; - `(not (and P Q))` ≡ `(or (not P) (not Q))`
+;;
+;; These laws do not directly exist in type theory, because they require
+;; the *law of the excluded middle*, which will be explained in a further
+;; chapter.
+;;
+;; However if we only consider sets, then a complete boolean algebra
+;; of sets can be constructed. More precisely, for each type `T` a
+;; specific boolean algbera can be constructed, based on the
+;; following ingredients:
+;; 
+;; - the emptyset corresponds to `False`
+;; - the fullset corresponds to `True`
+;; - the "disjunction" ("plus") is *set union*
+;; - the "conjunction" ("times") is *set intersection*
+;; - the "negation" is *set complement*
+;;
+;; Let's define (or see the definition of) all these ingredients.
+;; We already have the emptyset, so let's define the fullset.
+;;}
+
+(definition fullset
+  [[T :type]]
+  (set-of [x T] (not p/absurd)))
