@@ -18,8 +18,9 @@ Can't children select their prefered ice cream flavour in type theory?
 
 
 ```clojure
-(ns latte-tutorial.ch05-set-thoery
+(ns latte-tutorial.ch05-set-theory
   (:require [latte.core :as latte :refer [definition defthm deflemma
+                                          lambda forall
                                           example try-example
                                           proof try-proof
                                           assume have qed]]
@@ -27,12 +28,14 @@ Can't children select their prefered ice cream flavour in type theory?
             [clojure.repl :refer [doc]]
             
             ;; set theory requirements
-            [latte-sets.core :as set :refer [set elem subset seteq]]
+            [latte-sets.core :as set :refer [set elem set-of subset seteq]]
+            ;; boolean algebra of sets
+            [latte-sets.algebra :as setops :refer [union inter diff complement]]
             )
 
   
   ;; also, these belong to logic or formal arithmetic
-  (:refer-clojure :exclude [and or not set]))
+  (:refer-clojure :exclude [and or not set complement]))
 
 ```
 
@@ -131,10 +134,10 @@ The proof is by contradiction, and it is very simple.
 
 ```clojure
 (proof 'my-emptyset-empty
+  "We assume that x is in the emptyset ..."
   (assume [x T
-           "We assume that x is in the emptyset"
            H ((my-emptyset T) x)]
-    "and it is absurd by definition of the emptyset"
+    "... and it is absurd by definition of the emptyset"
     (have <a> p/absurd :by H))
   (qed <a>))
 ;; => [:qed my-emptyset-empty]
@@ -155,9 +158,7 @@ Thus, we can rewrite our theorem and proof as follows:
 
 (proof 'my-emptyset-empty-v2
   (assume [x T
-           "We assume that x is in the emptyset"
            H (elem x (my-emptyset T))]
-    "and it is absurd by definition of the emptyset"
     (have <a> p/absurd :by H))
   (qed <a>))
 ;; => [:qed my-emptyset-empty-v2]
@@ -201,7 +202,7 @@ our two sets as follows:
 s1 ≡ { x:T | P1(x) }  and s1 ≡ { y:T | P2(x) }  
 ```
 ;;
-The the definition simply says that `P1` should imply `P2`.
+The definition simply says that `P1` should imply `P2`.
 You probably know that the emptyset is vacuously a subset
 of any other set. Let's prove this as a Lemma.
 
@@ -302,5 +303,243 @@ proper *equivalence relation* (together with symmetry).
 
 We will go back to this notion of equality/equivalence,
 and compare it with other "competing" notions.
+
+
+
+## Boolean algebra of sets
+;;
+One major contribution of *George Boole* was its discovery (and study) of the
+relation between algebra (at that time, mostly developed for numbers) and
+logic. There is for example a simple correspondance between calculating
+in base 2 arithmetics, and propositional logic. `True` is 1, `False` is 0,
+`and` is `times`, `or` is `plus`, etc.
+;;
+Important algebraic properties follow the correspondance: `False` is a
+unit of disjunction and "absorbing" for conjunection, `True` is simply
+the converse.
+;;
+A similar boolean algebra of sets can be constructed. More precisely, for each type `T` a
+specific boolean algebra can be constructed, based on the following ingredients:
+
+- the emptyset corresponds to `False`
+- the fullset corresponds to `True`
+- the "disjunction" ("plus") is *set union*
+- the "conjunction" ("times") is *set intersection*
+- the "negation" is *set complement*
+;;
+Let's define (or see the definition of) all these ingredients.
+We already have the emptyset, so let's define the fullset.
+
+
+```clojure
+(definition my-fullset
+  [[T :type]]
+  (set-of [x T] (not p/absurd)))
+;; => [:defined :term my-fullset]
+
+```
+
+Everything is "not absurd", hence this should be a good candidate for
+being the set of "all possible `T`'s". Let's check this.
+
+
+```clojure
+(deflemma my-fullset-elem
+  [[T :type]]
+  (forall [x T] (elem x (my-fullset T))))
+;; => [:declared :lemma my-fullset-elem]
+
+(proof 'my-fullset-elem
+  (assume [x T]
+    "I would like to have `(==> p/absurd p/absurd)`."
+    (assume [H p/absurd]
+      (have <a> p/absurd :by H))
+    "And here it is!"
+    (have <b> (==> p/absurd p/absurd) :by <a>)
+    "This is a synonym for the following:"
+    (have <c> (not p/absurd) :by <b>))
+  "And we're done."
+  (qed <c>))
+
+```
+
+This can of course be rewritten as a one-liner.
+
+
+```clojure
+(proof 'my-fullset-elem
+  (qed (lambda [x T] 
+         (lambda [H p/absurd] H))))
+;; => [:qed my-fullset-elem]
+
+```
+
+### Union
+;;
+The union of two sets is a concept similar to logical disjunction.
+Indeed, an element is member of the union of `s1` and `s2` if
+it is a member of `s1` *or* a member of `s2` (or both).
+;;
+This is trivial to translate this in LaTTe:
+
+
+```clojure
+(definition my-union
+  [[T :type] [s1 (set T)] [s2 (set T)]]
+  (set-of [x T] (or (elem x s1)
+                    (elem x s2))))
+;; => [:defined :term my-union]
+
+```
+
+Let's prove, as an example, that the emptyset set
+is a left unit of union (like `False` is a left unit
+of disjunction).
+
+
+```clojure
+(defthm my-union-left-unit
+  [[T :type] [s (set T)]]
+  (seteq (my-union T (my-emptyset T) s)
+         s))
+;; => [:declared :theorem my-union-left-unit]
+
+```
+
+Proving `(seteq s1 s2)` consists in building a conjunction of two "sub-proofs":
+;;
+- an "if" proof of `(subset s1 s2)`
+- a "only-if" proof of `(subset s2 s1)`
+;;
+We will state and prove each one of these as an auxiliary lemma. 
+
+
+```clojure
+(deflemma my-union-left-unit-if
+  [[T :type] [s (set T)]]
+  (subset (my-union T (my-emptyset T) s)
+          s))
+;; => [:declared :lemma my-union-left-unit-if]
+
+(proof 'my-union-left-unit-if
+  (assume [x T
+           Hx (elem x (my-union T (my-emptyset T) s))]
+    "We simplify a little bit the assumption."
+    (have <Hx>  (or (elem x (my-emptyset T))
+                   (elem x s)) :by Hx)
+    "We have now to prove that x ∈ s.
+Union is disjunction hence we consider two cases."
+    (assume [H1 (elem x (my-emptyset T))]
+      (have <a1> p/absurd :by ((my-emptyset-empty T) x H1))
+      (have <a> (elem x s) :by (<a1> (elem x s))))
+    "Second case is trivial."
+    (assume [H2 (elem x s)]      
+      (have <b> (elem x s) :by H2))
+    "Or elimination can be performed now."
+    (have <c> _ :by (p/or-elim Hx (elem x s) <a> <b>)))
+  (qed <c>))
+;; => [:qed my-union-left-unit-if]
+
+```
+
+And now for the opposite "only-if" direction.
+
+
+```clojure
+(deflemma my-union-left-unit-only-if
+  [[T :type] [s (set T)]]
+  (subset s
+          (my-union T (my-emptyset T) s)))
+;; => [:declared :lemma my-union-left-unit-only-if]
+
+```
+
+The proof is much simpler for this case.
+
+
+```clojure
+(proof 'my-union-left-unit-only-if
+  (assume [x T
+           Hx (elem x s)]
+    (have <a> (or (elem x (my-emptyset T)) (elem x s))
+          :by (p/or-intro-right (elem x (my-emptyset T)) Hx)))
+  (qed <a>))
+;; => [:qed my-union-left-unit-only-if]
+
+```
+
+And now we can prove the "equivalence" theorem.
+
+
+```clojure
+(proof 'my-union-left-unit
+  (qed (p/and-intro (my-union-left-unit-if T s)
+                    (my-union-left-unit-only-if T s))))
+;; => [:qed my-union-left-unit]
+
+```
+
+**Exercise**: prove the "right unit" theorem for union.
+
+
+```clojure
+(defthm my-union-right-unit
+  [[T :type] [s (set T)]]
+  (seteq (my-union T s (my-emptyset T))
+         s))
+
+```
+
+**Exercise**: prove that the fullset is "lef-absorbing", i.e:
+
+```clojure
+(seteq (my-union T (my-fullset T) s)
+       (my-fullset T))
+```
+(of course it is also "right-absorbing")
+
+
+
+### Intersection
+
+*Set intersection* is almost copy-and-paste for `union`, replacing `or` by `and`.
+
+
+```clojure
+(definition my-inter
+  [[T :type] [s1 (set T)] [s2 (set T)]]
+  (set-of [x T] (and (elem x s1)
+                     (elem x s2))))
+;; => [:defined :term my-inter]
+
+```
+
+### Complement
+
+Logical negation is connected to the notion of a *set complement*. 
+
+
+```clojure
+(definition my-complement
+  [[T :type] [s (set T)]]
+  (set-of [x T] (not (elem x s))))
+;; => [:defined :term my-complement]
+
+```
+
+I really like this definition, because it gives a very concise and concrete
+argument in favor of a "typed" reconstruction of set theory.
+In classical axiomatic set theory, the complement has a rather, let's say
+unwieldy definition. Let's e.g. what Wikipedia is saying:
+
+> If A is a set, then the absolute complement of A (or simply the complement of A) is the set of elements not in A. In other words, if U is the universe that contains all the elements under study, and there is no need to mention it because it is obvious and unique, then the absolute complement of A is the relative complement of A in U.
+
+[from Wikipedia (retrieved Feb. 10, 2019)](https://en.wikipedia.org/wiki/Complement_(set_theory))
+
+In "everyday mathematics", this notion of an *universe* is not really problematic (because "it is obvious and unique"),
+but in formal mathematics it is a rather unsettling notion. In type theory, things are much more natural,
+the universe is simply the type `T` in `(set T)`. The complement is all those `T` that are not in the set `s`, a very
+natural definition is you ask me.
+
 
 
