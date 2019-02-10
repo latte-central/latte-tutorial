@@ -27,7 +27,7 @@ Can't children select their prefered ice cream flavour in type theory?
             [clojure.repl :refer [doc]]
             
             ;; set theory requirements
-            [latte-sets.core :as set :refer [set elem]]
+            [latte-sets.core :as set :refer [set elem subset seteq]]
             )
 
   
@@ -70,7 +70,7 @@ we can build our set as follows:
 This function represents exactly what we need: all the `x`'s of type `T` such that `(P x)` holds.
 We will now see how much (if not all?) of the "layperson" set theory
 can be rebuilt based on this simple idea. 
-;;
+
 As a first example, we can define the "emptyset" of type `T`.
 
 
@@ -91,14 +91,14 @@ type theory. Each type `T` possesses its own emptyset: this is *typed* set theor
 ## Set membership
 ;;
 The definition of a set (precisely `latte-sets.core/set`) in LaTTe is as follows:
-;;
+
 ```clojure
 (definition set
   "The type of sets whose elements are of type `T`."
   [[T :type]]
   (==> T :type))
 ```
-;;
+
 So it is a function from a type `T` to `:type`, the type of propositions.
 Put in other terms, it is a proposition conditioned by a type.
 We can check that our definition of an emptyset satisfies this definition.
@@ -113,9 +113,9 @@ We can check that our definition of an emptyset satisfies this definition.
 
 Set theory is all about *membership*: making a clear separation about who is
 in the type, and who isn't? In LaTTe set membership is very simple: it is (again!) function application.
-;;
+
 > For an element `e` and a set `E`, `e`∈`E` iff `(E e)` !
-;;
+
 As an example, we can show that an emptyset cannot contain any element.
 
 
@@ -132,9 +132,9 @@ The proof is by contradiction, and it is very simple.
 ```clojure
 (proof 'my-emptyset-empty
   (assume [x T
-           ;; We assume that x is in the emptyset
+           "We assume that x is in the emptyset"
            H ((my-emptyset T) x)]
-    ;; and it is absurd by definition of the emptyset
+    "and it is absurd by definition of the emptyset"
     (have <a> p/absurd :by H))
   (qed <a>))
 ;; => [:qed my-emptyset-empty]
@@ -155,9 +155,9 @@ Thus, we can rewrite our theorem and proof as follows:
 
 (proof 'my-emptyset-empty-v2
   (assume [x T
-           ;; We assume that x is in the emptyset
+           "We assume that x is in the emptyset"
            H (elem x (my-emptyset T))]
-    ;; and it is absurd by definition of the emptyset
+    "and it is absurd by definition of the emptyset"
     (have <a> p/absurd :by H))
   (qed <a>))
 ;; => [:qed my-emptyset-empty-v2]
@@ -167,16 +167,140 @@ Thus, we can rewrite our theorem and proof as follows:
 This is probably more readable for the mathematics (and lisp) practionner.
 Note, also, that there is aspecific notation for the definition
 of a set by comprehension:
-;;
+
 ```clojure
 { x : T | P(x) }  is  (set-of [x T] (P x))
 ... which is (lambda [x T] (P x))
 ```
-Note that it is important to remember that `set-of` constructions are still `lambda`'s.
+It is important to remember that `set-of` constructions are still `lambda`'s.
 
 
 
 ## Subsets and set-equality
+
+There is an important relationship between implication and being *a subset of* another set.
+This is clearly apparent in the following definition:
 ;;
-TODO
+```clojure
+(definition subset-def
+  "The subset relation for type `T`.
+The expression `(subset-def T s1 s2)` means that
+ the set `s1` is a subset of `s2`, i.e. `s1`⊆`s2`."
+  [[T :type] [s1 (set T)] [s2 (set T)]]
+  (forall [x T]
+    (==> (elem x s1)
+         (elem x s2))))
+```
+In the library a shortcut `(subset s1 s2)` is also defined.
+The definition says that a set (`s2`) is a subset of another
+set (`s1`), both defined over a type `T`, if for any element `x` of the
+considered type `T`,  `x`∈`s1` implies `x`∈`s2`. If we rewrite slightly
+our two sets as follows:
+;;
+```clojure
+s1 ≡ { x:T | P1(x) }  and s1 ≡ { y:T | P2(x) }  
+```
+;;
+The the definition simply says that `P1` should imply `P2`.
+You probably know that the emptyset is vacuously a subset
+of any other set. Let's prove this as a Lemma.
+
+
+```clojure
+(deflemma empty-subset
+  [[T :type] [s (set T)]]
+  (subset (my-emptyset T) s))
+
+(proof 'empty-subset
+  (assume [x T
+           Hempty (elem x (my-emptyset T))]
+    "Of course we proceed by contradiction,
+because we know that there is no such element x"
+    (have <a> (not (elem x (my-emptyset T)))
+          :by ((my-emptyset-empty T) x))
+    "Hence we obtain absurdity"
+    (have <b> p/absurd :by (<a> Hempty))
+    "We can have anything we want here!"
+    (have <c> (elem x s) :by (<b> (elem x s))))
+  (qed <c>))
+;; => [:qed empty-subset]
+
+```
+
+**Exercise**: prove the following theorems:
+
+- `subset-refl`: the subset relation is *reflexive*: `(subset s s)` for any set `s`
+- `subset-trans`: it is *transitive*: if `(subset s1 s2)` and `(subset s2 s3)` then `(subset s1 s3)`
+
+
+
+We can define a useful notion of equality based on the subset relation.
+It is technically-speaking rather an equivalence relation, so let's
+call it *"set equivalence"*.
+
+```clojure
+(definition seteq-def
+  "Set equivalence.
+  This is a natural notion of \"equal sets\"
+  based on the subset relation."
+  [[T :type] [s1 (set T)] [s2 (set T)]]
+  (and (subset s1 s2)
+       (subset s2 s1)))
+```
+And you may rewrite `(seteq-def T s1 s2)` as `(seteq s1 s2)`.
+
+It is rather a trivial fact that this equivalence is symmetric.
+
+
+```clojure
+(defthm seteq-sym
+  [[T :type] [s1 (set T)] [s2 (set T)]]
+  (==> (seteq s1 s2)
+       (seteq s2 s1)))
+
+```
+
+The proof is a one-liner.
+
+
+```clojure
+(proof 'seteq-sym
+  (qed (lambda [H (seteq s1 s2)] (p/and-sym H))))
+;; => [:qed seteq-sym]
+
+```
+
+Well, maybe it's a little bit too crytpic, let's decompose
+the proof.
+
+
+```clojure
+(proof 'seteq-sym
+  (assume [H (seteq s1 s2)]
+    "We can decompose the conjunction."
+    (have <a> (subset s1 s2) :by (p/and-elim-left H))
+    (have <b> (subset s2 s1) :by (p/and-elim-right H))
+    "Now let's rebuild a conjunction by reversing
+the two previous steps"
+    (have <c> (and (subset s2 s1)
+                   (subset s1 s2))
+          :by (p/and-intro <b> <a>))
+    "This is set equivalence!"
+    (have <d> (seteq s2 s1) :by <c>))
+  (qed <d>))
+  ;;=>  [:qed seteq-sym]
+
+```
+
+The following exercise (if solved) shows that `seteq` is a
+proper *equivalence relation* (together with symmetry).
+
+**Exercise**: prove the following theorems:
+
+- `seteq-refl`: reflexivity of set equality
+- `seteq-trans`: transitivity of set equality`
+
+We will go back to this notion of equality/equivalence,
+and compare it with other "competing" notions.
+
 
