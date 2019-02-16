@@ -88,7 +88,7 @@
 
 ;;{
 ;; ## Set membership
-;;
+;; 
 ;; The definition of a set (precisely `latte-sets.core/set`) in LaTTe is as follows:
 ;; 
 ;; ```clojure
@@ -169,7 +169,7 @@
 ;; 
 ;; There is an important relationship between implication and being *a subset of* another set.
 ;; This is clearly apparent in the following definition:
-;;
+;; 
 ;; ```clojure
 ;; (definition subset-def
 ;;   "The subset relation for type `T`.
@@ -185,11 +185,11 @@
 ;; set (`s1`), both defined over a type `T`, if for any element `x` of the
 ;; considered type `T`,  `x`∈`s1` implies `x`∈`s2`. If we rewrite slightly
 ;; our two sets as follows:
-;;
+;; 
 ;; ```clojure
 ;; s1 ≡ { x:T | P1(x) }  and s1 ≡ { y:T | P2(x) }  
 ;; ```
-;;
+;; 
 ;; The definition simply says that `P1` should imply `P2`.
 ;; You probably know that the emptyset is vacuously a subset
 ;; of any other set. Let's prove this as a Lemma.
@@ -287,17 +287,17 @@ the two previous steps"
 
 ;;{
 ;; ## Boolean algebra of sets
-;;
+;; 
 ;; One major contribution of *George Boole* was its discovery (and study) of the
 ;; relation between algebra (at that time, mostly developed for numbers) and
 ;; logic. There is for example a simple correspondance between calculating
 ;; in base 2 arithmetics, and propositional logic. `True` is 1, `False` is 0,
 ;; `and` is `times`, `or` is `plus`, etc.
-;;
+;; 
 ;; Important algebraic properties follow the correspondance: `False` is a
 ;; unit of disjunction and "absorbing" for conjunection, `True` is simply
 ;; the converse.
-;;
+;; 
 ;; A similar boolean algebra of sets can be constructed. More precisely, for each type `T` a
 ;; specific boolean algebra can be constructed, based on the following ingredients:
 ;; 
@@ -306,7 +306,7 @@ the two previous steps"
 ;; - the "disjunction" ("plus") is *set union*
 ;; - the "conjunction" ("times") is *set intersection*
 ;; - the "negation" is *set complement*
-;;
+;; 
 ;; Let's define (or see the definition of) all these ingredients.
 ;; We already have the emptyset, so let's define the fullset.
 ;;}
@@ -349,11 +349,11 @@ the two previous steps"
 
 ;;{
 ;; ### Union
-;;
+;; 
 ;; The union of two sets is a concept similar to logical disjunction.
 ;; Indeed, an element is member of the union of `s1` and `s2` if
 ;; it is a member of `s1` *or* a member of `s2` (or both).
-;;
+;; 
 ;; This is trivial to translate this in LaTTe:
 ;;}
 
@@ -377,10 +377,10 @@ the two previous steps"
 
 ;;{
 ;; Proving `(seteq s1 s2)` consists in building a conjunction of two "sub-proofs":
-;;
+;; 
 ;; - an "if" proof of `(subset s1 s2)`
 ;; - a "only-if" proof of `(subset s2 s1)`
-;;
+;; 
 ;; We will state and prove each one of these as an auxiliary lemma. 
 ;;}
 
@@ -472,6 +472,46 @@ Union is disjunction hence we consider two cases."
 ;; => [:defined :term my-inter]
 
 ;;{
+;; And of course, the handling of intersection mostly relies on the
+;; proof techniques developed for conjunction. And the properties
+;; are also very close (in the same spirit as union vs. disjunction).
+;;}
+
+(defthm my-inter-sym [[T :type] [s1 (set T)] [s2 (set T)]]
+  (seteq (my-inter T s1 s2)
+         (my-inter T s2 s1)))
+;; => [:declared :theorem my-inter-sym]
+
+(proof 'my-inter-sym
+  "First part ==> subset"
+  (assume [x T
+           Hx (elem x (my-inter T s1 s2))]
+    (have <a1> (elem x s1) :by (p/and-elim-left Hx))
+    (have <a2> (elem x s2) :by (p/and-elim-right Hx))
+    "We just have to reverse the conjunction"
+    (have <a> (elem x (my-inter T s2 s1))
+          :by (p/and-intro <a2> <a1>)))
+  "And now the symmetric way"
+  (assume [x T
+           Hx (elem x (my-inter T s2 s1))]
+    (have <b1> (elem x s2) :by (p/and-elim-left Hx))
+    (have <b2> (elem x s1) :by (p/and-elim-right Hx))
+    (have <b> (elem x (my-inter T s1 s2))
+          :by (p/and-intro <b2> <b1>)))
+  "Conclusion"
+  (qed (p/and-intro <a> <b>)))
+;; => [:qed my-inter-sym]
+
+;;{
+;; In the standard library, the intersection is written `(inter s1 s2)`.
+;; 
+;; **Exercise**: state and prove that:
+;;
+;; - the emptyset is "absorbing" for intersection
+;; - the fullset is a unit for intersection
+;;}
+
+;;{
 ;; ### Complement
 ;; 
 ;; Logical negation is connected to the notion of a *set complement*. 
@@ -496,6 +536,60 @@ Union is disjunction hence we consider two cases."
 ;; but in formal mathematics it is a rather unsettling notion. In type theory, things are much more natural,
 ;; the universe is simply the type `T` in `(set T)`. The complement is all those `T` that are not in the set `s`, a very
 ;; natural definition is you ask me.
-;; 
+;;
+;; Now we can state and prove a natural connection between the emptyset and the fullset.
 ;;}
 
+(defthm empty-complement [[T :type]]
+  (seteq (my-complement T (my-emptyset T))
+         (my-fullset T)))
+;; => [:declared :theorem empty-complement]
+
+(proof 'empty-complement
+  "first part"
+  (assume [x T
+           Hx (elem x (my-complement T (my-emptyset T)))]
+    "Since all elements are member of the fullset, we don't
+even have to look at the hypothesis `Hx`"
+    (have <a> (elem x (my-fullset T)) :by ((my-fullset-elem T) x)))
+  "second part"
+  (assume [x T
+           Hx (elem x (my-fullset T))]
+    "We exploit the following."
+    (have <b> (not (elem x (my-emptyset T)))
+          :by ((my-emptyset-empty T) x)))
+  "conclusion"
+  (qed (p/and-intro <a> <b>)))
+;; => [:qed empty-complement]
+
+;;{
+;; In the standard library, the complement of a set `s` is `(complement s)`.
+;; 
+;; **Exercise**: prove the following
+;;}
+
+(defthm full-complement [[T :type]]
+  (seteq (my-complement T (my-fullset T))
+         (my-emptyset T)))
+;; => [:declared :theorem full-complement]
+
+
+;;{
+;; ## Summary
+;; 
+;; In this chapter, we saw how the *primitive* notion of a set in "traditional" mathematics
+;; could be "reinvented" in type theory, but this time as a *derived* notion... from
+;; the more primitive notion of a type.
+;;
+;; Also:
+;;
+;; - union is simply a disjunction under a lambda
+;; - intersection is similar but for conjunction
+;; - the notion of complement is more natural in type theory
+;;
+
+;; There are much more interesting things to discover in the `latte-sets` standard library,
+;; especially the *relational algebra* and also *partial functions*. In this tutorial, we
+;; will go back to sets to discuss again the notion of equality, and also when talking
+;; about quantifiers.
+;;}
