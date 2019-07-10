@@ -10,25 +10,25 @@
 
 This document is a tutorial introduction to the LaTTe proof assistant.
 
-Here are the primary goals:
+My primary goal is to write:
 
   - a quick startup guide to LaTTe,
   - a pedagogical overview of its main features,
   - a first experiment with important proof rules.
 
-The main non-goals are:
+Some non-goals are:
 
   - a complete course about e.g. type theory or logic, or whatever,
   - an exhaustive manual for the proof assistant,
   - a maths lecture.
 
-So I'll go straight-to-the-point, often omitting (probably) important
+Thus I'll go straight-to-the-point, often omitting (probably) important
 aspects.
 
 The tutorial is heavily inspired by [a talk about LaTTe](https://www.youtube.com/watch?v=5YTCY7wm0Nw)
 that I gave at EuroClojure'2016. 
 LaTTe changed quite a bit since then, but the video is still a
-good example of "live coding mathematics".
+good example of what I call "live coding mathematics".
 
 The source for this tutorial is a *literate programming* document, which means it is
 both a textual document with Clojure (and LaTTe) code examples, and also
@@ -65,7 +65,7 @@ The solutions are available in the `solutions` branch (which should be at least 
 
 ## Author
 
-I think it is good to introduce oneself when talking to other people.
+I think it is good to introduce oneself when explaining things to other people.
 
 My name is Frederic Peschanski, I am an associated professor in computer science
 at Sorbonne University in Paris, France. I do research mostly on theoretical
@@ -93,7 +93,7 @@ I developed LaTTe after reading (devouring, more so) the following book:
 
 That's a heavily recommended lecture if you are interested in logic in general,
 and the $\lambda$-calculus in particular. It is also the best source of information
-the understand the underlying theory of LaTTe. However it is not a prerequisite
+to understand the underlying theory of LaTTe. However it is not a prerequisite
 for learning and using LaTTe.
 
 I would also like to thank Yeonathan Sharvit and Hiram Madelaine as well as
@@ -107,10 +107,10 @@ is in fact a perfectly usable **proof assistant** for doing formal mathematics
 and logic on a computer. It's far from being the most advanced proof assistance
 technology but it still provides some interesting features.
 
-**Remark**: The double *TT* of LaTTe is also looking like
+**Remark**: The double *TT* of LaTTe intentioanally looks like
 Π the Greek capital letter Pi, which is one of the very few
-constructors of the type theory used by LaTTe, a very simple dependently typed
-lambda-calculus. This will be explained, at least superficially, in the tutorial.
+constructors of the type theory used by LaTTe. 
+This will be explained, at least superficially, in the tutorial.
 
 The basic activity of a proof assistant user is to:
 
@@ -131,8 +131,8 @@ Also this means that any Clojure development environment (e.g. Cider, Cursive) c
 be used as a proof assistant GUI. And this is where most of the power of LaTTe lies.
 Indeed, the Clojure IDEs support very advanced interactive features. Moreover, one can
 extend the assistant directly in Clojure and without any intermediate such as a
-plugins system or complex API. We'll see, however, that there are a few places where
-writing Clojure code is required in LaTTe in particular to write *implicits*.
+plugins system or complex API. ;; In fact, you develop mathematics in Clojure 
+*exactly like* you develop programs in general, there's not difference at all!
 
 Moreover, the mathematical contents developed using LaTTe can be distributed
 using the very powerful Clojure ecosystem based on the Maven packaging tool.
@@ -140,14 +140,12 @@ Also, there is a simple yet effective *proof certification* scheme that
 corresponds to a form of compilation for the distributed content.
 Proving things in type theory can become rather computationally intensive,
 but a certified proof can be "taken for granted".
-In fact, you develop mathematics in Clojure *exactly like* you develop programs
-in general, there's not difference at all!
 
 Last but not least, the main innovative feature of LaTTe is its *declarative proof language*,
 which makes the proofs follow the *natural deduction* style. The objective is to make LaTTe proofs
 quite similar to standard mathematical proofs, at least strucutrally. One still has to
 deal with the Clojure-enhanced Lisp notation, i.e. a perfectly non-ambiguous mathematical
-notation, only slightly remote from "main-stream" mathematics.
+notation, only slightly remote from "mainstream" mathematics.
 
 
 
@@ -155,16 +153,16 @@ notation, only slightly remote from "main-stream" mathematics.
 ## Intended audience
 
 You might be interested in LaTTe because as a Clojure developer you are curious
-about type theory, the lambda-calculus with dependent types, the Curry-Howard correspondance,
+about the lambda-calculus, dependent types, the Curry-Howard correspondance,
 or simply formal logic and mathematics.
 
 You might also be interested in LaTTe to develop some formal mathematical contents, based on
 an approach that is not exactly like other proof assistants. I very much welcome mathematical
 contributions to the project!
 
-Finally, you might be intersted in how one may embed a *domain-specific language*, the
-Lisp way in Clojure (thus with an extra-layer of data-orientation). Clojure the language
-is still there when using Clojure, but you're doing not only programming but also
+Finally, you might be interested in how one may embed a *domain-specific language*, the
+Lisp way, in Clojure (thus with an extra-layer of data-orientation). Clojure the language
+is still there when using LaTTe, but you're doing not only programming but also
 mathematics and reasoning... The *same* difference, the Lisp way...
 
 Or maybe you're here and that's it!
@@ -184,8 +182,6 @@ and the REPL.
 Note that beyond basic functional programming principles, there's nothing much to
 learn on the Clojure side. Still, if you don't know Clojure  I can only recommend
 to read the first few chapters of an introductory Clojure book.
-I don't want to give any specific recommendation since most of the introductory
-books I've read are quite good ...
 
 
 
