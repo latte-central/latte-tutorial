@@ -44,8 +44,9 @@ using function application.
 In this chapter of the tutorial, we will discuss the introduction
 and elimination rules for other important logical constructs.
 The implementation of this basic rules can be found in the
-[prop](https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/prop.clj) namespace
-of the [latte-prelude](https://github.com/latte-central/latte-prelude) library.
+[prop](https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/prop.clj) and 
+[quant](https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/quant.clj) namespaces
+of the [latte-prelude](https://github.com/latte-central/latte-prelude) library, a.k.a. the "standard" library.
 
 
 
@@ -1249,6 +1250,24 @@ We will see other proofs by contradiction in the rest of the tutorial.
 ```
 
 What about the converse? Can you prove it?
+
+
+
+## To be or not to be? That is the existential question!
+
+There is no direct support for *existential quantification* in the
+kernel theory of LaTTe, unlike the universal (∀) case. However, there is
+a beautiful encoding of the existential quantifier, which is defined
+in the [quant](https://github.com/latte-central/latte-prelude/blob/master/src/latte_prelude/quant.clj)
+library of the LaTTe prelude. It is as follows.
+
+```clojure
+(definition ex-def
+  [[T :type] [P (==> T :type)]]
+ (forall [α :type]
+   (==> (forall [x T] (==> (P x) α))
+        α)))
+```
 
 
 
