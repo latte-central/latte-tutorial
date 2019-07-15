@@ -8,7 +8,7 @@ MFLAGS = --begin ";;{" --end ";;}" --lang "clojure" --remove-prefix ";; "
 PANDOC = pandoc
 HIGHLIGHT_STYLE = tango # tango pygments espresso zenburn kate monochrome breezeda
 
-PANDOC_FLAGS = -s --toc --pdf-engine=xelatex --metadata-file=book.yaml --highlight-style=$(HIGHLIGHT_STYLE)
+PANDOC_FLAGS = -s --toc --template=template.latex --pdf-engine=xelatex --metadata-file=book.yaml --highlight-style=$(HIGHLIGHT_STYLE)
 
 
 HEADER = header.md

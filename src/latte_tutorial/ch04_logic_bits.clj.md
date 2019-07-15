@@ -1268,6 +1268,61 @@ library of the LaTTe prelude. It is as follows.
    (==> (forall [x T] (==> (P x) α))
         α)))
 ```
+The details are not so important but roughly if we write in LaTTe:
+```clojure
+(ex-def T (λ [x T] (P x)))
+```
+for all intent and purpose it has the same logical meaning as saying:
+
+> there exists an `x` of type `T` such that `(P x)` is true.
+
+In LaTTe a convenient *notation* is defined so that `ex-def` expressions
+are written in a more conventional manner, as follows:
+
+```clojure
+(exists [x T] (P x))
+```
+Thus, we now how to write an existential quantification, but *what is* precisely
+the logical meaning of it requires the associated introduction and elimination rules.
+
+
+
+
+### Introduction rule
+
+For the introduction rule we have:
+
+```clojure
+(defthm ex-intro-thm
+  [[T :type] [P (==> T :type)] [x T]]
+  (==> (P x)
+       (ex P)))
+```
+The notation `(ex P)` is a shortcut for when we do not need to isolated the `x` variable
+in the existential (and `(ex P)` is exactly the same as `(ex-def T P)` with `T` the domain
+of `P` that is in fact inferred from it).
+So the rule simply says that if the predicate `P` is true for some `x` then the existential
+quantification old.
+> If `x` is a human, then there *exists* a human!
+
+**Exercise**: prove the following.
+
+```clojure
+(defthm my-ex-intro-thm
+  [[T :type] [P (==> T :type)] [x T]]
+  (==> (P x)
+       (ex-def T P)))
+```
+
+
+```clojure
+(defthm ex-elim-thm
+  [[T :type] [P (==> T :type)] [A :type]]
+  (==> (ex P)
+       (forall [x T] (==> (P x) A))
+A))
+```
+
 
 
 
