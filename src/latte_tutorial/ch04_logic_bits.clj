@@ -13,9 +13,13 @@
   (:require [latte.core :as latte :refer [definition defthm deflemma
                                           example try-example
                                           proof try-proof
-                                          assume have qed]]
+                                          assume have pose qed
+                                          forall lambda]]
             ;; we will also exploit the basic proposition from the prelude
             [latte-prelude.prop :as p :refer [and and* or or* not <=>]]
+
+            ;; and existentials require the following namespace
+            [latte-prelude.quant :as q :refer [exists ex ex-def]]
 
             ;; we will also use the documentation
             [clojure.repl :refer [doc]])
@@ -72,8 +76,8 @@
   "logical conjunction, a remake"
   [[A :type] [B :type]]
   (forall [C :type]
-          (==> (==> A B C)
-               C)))
+    (==> (==> A B C)
+         C)))
 ;; => [:defined :term my-and]
 
 ;;{
@@ -709,7 +713,7 @@ my-and-intro
 ;;{
 ;; An important advice is to avoid mixing the binary and nary constructs:
 ;; 
-;;  - use `and-intro`, `and-elim-left` and `and-elim-r ight` with binary conjunction: `and`
+;;  - use `and-intro`, `and-elim-left` and `and-elim-right` with binary conjunction: `and`
 ;;  - use `and-intro*` and `and-elim*` with the nary variant: `and*`
 ;;}
 
@@ -785,14 +789,14 @@ my-and-intro
     (==> (<=> A B)
          (==> A B))
   (qed (lambda [H (<=> A B)]
-               (p/iff-elim-if H))))
+         (p/iff-elim-if H))))
 ;; => [:checked :example]
 
 (example [[A :type] [B :type]]
     (==> (<=> A B)
          (==> B A))
   (qed (lambda [H (<=> A B)]
-               (p/iff-elim-only-if H))))
+         (p/iff-elim-only-if H))))
 ;; => [:checked :example]
 
 ;;{
@@ -1215,27 +1219,84 @@ my-and-intro
 ;; of `P` that is in fact inferred from it).
 ;; So the rule simply says that if the predicate `P` is true for some `x` then the existential
 ;; quantification old.
+;; 
 ;; > If `x` is a human, then there *exists* a human!
-;; 
-;; **Exercise**: prove the following.
-;; 
-;; ```clojure
-;; (defthm my-ex-intro-thm
-;;   [[T :type] [P (==> T :type)] [x T]]
-;;   (==> (P x)
-;;        (ex-def T P)))
-;; ```
+;;  
+;; **Exercise**: Given the following definition
+;;}
 
+(definition my-ex-def
+  [[T :type] [P (==> T :type)]]
+  (forall [α :type]
+     (==> (forall [x T] (==> (P x) α))
+          α)))
+;;{
+;; Prove the following:
+;;}
+
+(defthm my-ex-intro-thm
+  [[T :type] [P (==> T :type)] [x T]]
+  (==> (P x)
+       (my-ex-def T P)))
+
+;;{
+;; **Hint**: look at the definition of `my-ex-def`, it's just forall and implication, so 
+;; it just a question of following the rules of the game presented in the previous chapter.
+;;}
+
+;;{
+;; ### Elimination rule
+;; 
+;; The elimination rule for the existential is the following one:
 ;; 
 ;; ```clojure
 ;; (defthm ex-elim-thm
 ;;   [[T :type] [P (==> T :type)] [A :type]]
 ;;   (==> (ex P)
 ;;        (forall [x T] (==> (P x) A))
-;; A))
+;;        A))
 ;; ```
 ;; 
+;; Considering an arbitrary proposition `A`, the definition says that if we know that there exists an 
+;; `x` of type `T` such that `(P x)`  (which is simply denoted by `(ex P)`), 
+;; and moreover if forall `x`'s of type `T` from `(P x)` we can deduce `A`, then `A` is true.
+;; 
+;; One way to explain this definition is that the assumption `(forall [x T] (==> (P x) A))` is very strong.
+;; We could deduce `A` by exhibiting a `z` such that `(P z)` and we would obtain `A`. But since we know
+;; that one exists, we don't need to explicitely provide this particular `z`.
+;; Let's prove this manually, using directly `my-ex-def`.
 ;;}
+
+(defthm my-ex-elim-thm
+  [[T :type] [P (==> T :type)] [A :type]]
+  (==> (my-ex-def T P)
+       (forall [x T] (==> (P x) A))
+       A))
+
+(proof 'my-ex-elim-thm
+  (assume [Hex (my-ex-def T P)
+           Hall (forall [x T] (==> (P x) A))]    
+    "First let's expand the definition of `my-ex-def`."
+    (have <a> (==> (forall [x T] (==> (P x) A))
+                   A) :by (Hex A))
+    "And know it is easy to obtain `A`."
+    (have <b> A :by (<a> Hall)))
+  "And we're done."
+  (qed <b>))
+;; => [:qed my-ex-elim-thm]
+
+;;{
+;; We will now consider a complete example of a proof involving the existential.
+;; The statemenent is as follows:
+;;}
+
+(deflemma exists-example
+  [[A :type] [B :type] [P (==> A B :type)]]
+  (==> (exists [a A]
+         (exists [b B] (P a b)))
+       (exists [b B]
+         (exists [a A] (P a b)))))
+
 
 ;;{
 ;; ## Natural logic, in summary
