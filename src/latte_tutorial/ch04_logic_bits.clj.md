@@ -14,12 +14,13 @@ do some actual logic.
   (:require [latte.core :as latte :refer [definition defthm deflemma
                                           example try-example
                                           proof try-proof
-                                          assume have qed]]
+                                          assume have pose qed
+                                          forall lambda]]
             ;; we will also exploit the basic proposition from the prelude
             [latte-prelude.prop :as p :refer [and and* or or* not <=>]]
 
             ;; and existentials require the following namespace
-            [latte-prelude.quant :as q :refer [ex-def]]
+            [latte-prelude.quant :as q :refer [exists ex ex-def]]
 
             ;; we will also use the documentation
             [clojure.repl :refer [doc]])
@@ -78,8 +79,8 @@ the definition is hidden from the user).
   "logical conjunction, a remake"
   [[A :type] [B :type]]
   (forall [C :type]
-          (==> (==> A B C)
-               C)))
+    (==> (==> A B C)
+         C)))
 ;; => [:defined :term my-and]
 
 ```
@@ -847,14 +848,14 @@ the implicit ones: `iff-intro`, `iff-elim-if` and `iff-elim-only-if`.
     (==> (<=> A B)
          (==> A B))
   (qed (lambda [H (<=> A B)]
-               (p/iff-elim-if H))))
+         (p/iff-elim-if H))))
 ;; => [:checked :example]
 
 (example [[A :type] [B :type]]
     (==> (<=> A B)
          (==> B A))
   (qed (lambda [H (<=> A B)]
-               (p/iff-elim-only-if H))))
+         (p/iff-elim-only-if H))))
 ;; => [:checked :example]
 
 ```
@@ -1378,6 +1379,86 @@ Let's prove this manually, using directly `my-ex-def`.
 ;; => [:qed my-ex-elim-thm]
 
 ```
+
+We will now consider a complete example of a proof involving the existential.
+The statemenent is as follows:
+
+
+```clojure
+(defthm exists-commute
+  [[A :type] [B :type] [P (==> A B :type)]]
+  (==> (exists [a A]
+         (exists [b B] (P a b)))
+       (exists [b B]
+         (exists [a A] (P a b)))))
+
+```
+
+This is an apparently trivial property of nested existentials: the order of
+the quantifier does not matter. While this sounds like a simple property, we
+already know that we will have to eliminate two existentials in the hypothesis,
+and we will then have to introduce two existentials in the conclusion.
+Hence, we will need to use both `q/ex-intro` and `q/ex-elim` twice, but in
+a nested way. So we can alreay imagine that the proof structure is not as simple
+as it may seem.
+
+To simplify a little bit the matter, we will also introduce a local definition
+using the `pose` proof command. Writing:
+
+```clojure
+(pose X := <expr>)
+```
+
+is exactly the same as writing:
+
+```clojure
+(have X _ :by <expr>)
+```
+
+Let's dig into the commutation proof.
+
+
+```clojure
+(proof 'exists-commute
+  (assume [Hex _] ;; cf. the assumption in the theorem
+    "We state our goal so that we do not have to write it everywhere."
+    (pose GOAL := (exists [b B]
+                    (exists [a A] (P a b))))
+    "We begin to eliminate the outer existential (for variable `a`)"
+    (assume [x A
+             Hx (exists [b B] (P x b))]
+      "The hypothesis `Hx` is our (P x) in the elimination rule.
+our objective is to prove the `GOAL` from it, but first we have
+to eliminate the inner existential (for variable `b`)."
+      (assume [y B
+               Hy (P x y)]
+        "We introduce first the inner existential of the `GOAL` 
+(i.e. for variable `a`)."
+        (have <a> (exists [a A] (P a y)) 
+              :by ((q/ex-intro (lambda [a A] (P a y)) x) Hy))
+        "And the we introduce the outer existential, reaching the `GOAL`."
+        (have <b> GOAL
+              :by ((q/ex-intro (lambda [b B] (exists [a A] (P a b))) y) 
+                   <a>)))
+      "We are now ready to eliminate the inner existential."
+      (have <c> _ :by ((q/ex-elim (lambda [y B] (P x y)) GOAL)
+                          Hx <b>)))
+    "And we can ultimately eliminate the outer existential."
+    (have <d> _ :by ((q/ex-elim (lambda [x A] (exists [b B] (P x b))) GOAL)
+                        Hex <c>)))
+  "We're done!"
+  (qed <d>))
+;; => [:qed exists-commute]
+
+```
+
+This should illustrate the relative complexity of the existential
+proof methods, especially the elimination part. However, we should
+keep in mind that existential reasoning is quite a powerful concept!
+I do not think there's too much incidental complexity involved here.
+
+
+
 
 ## Natural logic, in summary
 
