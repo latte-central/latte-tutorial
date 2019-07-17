@@ -1308,7 +1308,7 @@ of `P` that is in fact inferred from it).
 So the rule simply says that if the predicate `P` is true for some `x` then the existential
 quantification old.
 
-> If `x` is a human, then there *exists* a human!
+> If `x` is a jupitarian, then there *exists* a jupitarian!
  
 **Exercise**: Given the following definition
 
@@ -1316,9 +1316,9 @@ quantification old.
 ```clojure
 (definition my-ex-def
   [[T :type] [P (==> T :type)]]
-  (forall [α :type]
-     (==> (forall [x T] (==> (P x) α))
-          α)))
+  (forall [A :type]
+     (==> (forall [x T] (==> (P x) A))
+          A)))
 ```
 
 Prove the following:
@@ -1334,6 +1334,43 @@ Prove the following:
 
 **Hint**: look at the definition of `my-ex-def`, it's just forall and implication, so 
 it just a question of following the rules of the game presented in the previous chapter.
+
+
+
+Here is an example of usage of the introduction rule.
+
+
+```clojure
+(defthm ex-and-intro
+  [[T :type] [P (==> T :type)] [Q (==> T :type)] [x T]]
+  (==> (P x)
+       (Q x)
+       (exists [y T] (and (P y) (Q y)))))
+
+```
+
+The proof is rather simple.
+
+
+```clojure
+(proof 'ex-and-intro
+  (assume [HP _ HQ _]
+    (have <a> (and (P x) (Q x)) :by (p/and-intro HP HQ))
+    (have <b> (exists [y T] (and (P y) (Q y))) 
+          :by ((q/ex-intro (lambda [y T] (and (P y) (Q y))) x) <a>)))
+  (qed <b>))
+;; => [:qed ex-and-intro]
+
+```
+
+The only non-trival part is the `<b>` step. We are invoking the `ex-intro`
+rule which require a predicate `P` and a witness `x` that the predicate holds.
+We then provide the result of step `<a>`, i.e. a proof that `(P x)` holds to
+the introduction rule, which produces the required existential. 
+
+
+
+**Exercise**: redo the last proof using your own `my-ex-intro-thm`.
 
 
 
@@ -1380,7 +1417,71 @@ Let's prove this manually, using directly `my-ex-def`.
 
 ```
 
-We will now consider a complete example of a proof involving the existential.
+Let's consider a first example.
+
+
+```clojure
+(defthm ex-and-elim-left
+  [[T :type] [P (==> T :type)] [Q (==> T :type)]]
+  (==> (exists [x T] (and (P x) (Q x)))
+       (exists [x T] (P x))))
+
+```
+
+One possible proof is as follows. 
+
+
+```clojure
+(proof 'ex-and-elim
+  (assume [Hex _]
+    (assume [y T
+             Hy (and (P y) (Q y))]
+      (have <a> (P y) :by (p/and-elim-left Hy))
+      "We need to introduce the existential of the goal."
+      (have <b> (exists [x T] (P x)) 
+            :by ((q/ex-intro (lambda [x T] (P x)) y) <a>)))
+    "Now we are ready for the existential elimination"
+    (have <c> _  ;; the obtain proposition is the second argument
+          :by ((q/ex-elim (lambda [x T] (and (P x) (Q x))) 
+                          ;; below is what we want
+                          (exists [x T] (P x)))
+               Hex ;; the proof for the existential 
+               <b> ;; the proof for the generalization
+               )))
+  (qed <c>))
+;; => [:qed ex-and-elim]
+
+```
+
+In this proof we used the `ex-elim` implicit, which is like `ex-elim-thm` 
+but with the first type synthetized, i.e. `(ex-elim P x)` is the 
+same as `(ex-elim-thm T P x)` provided `P` is of type `(==> T :type)`.
+
+Note that when applying the elimination rule (step `<c>` above), 
+we used the underscore `_` so that the type of the step is inferred.
+This is because the type we target is an argument of the elimination rule.
+In fact the situation is similar to the `or-elim` rule for disjunction,
+and indeed there is a tight connection between existential and or.
+Consider the following statement:
+
+> a prime number is 2, or 3, or, 5, or etc. (infinitely) 
+
+This does not define the prime numbers, but merely says that we could
+list them all because there is \emph{at least} one of them.
+So from a purely logical point of view, the previous informal statement
+(an infinite disjunction) can be formalized as a single existential:
+
+> there exists some prime number
+
+
+
+
+**Exercise** : state and prove the complement right elimination.
+Try to use your own `my-ex-elim-thm` in the proof.
+
+
+
+We will now consider a more complex example of a proof involving the existential.
 The statemenent is as follows:
 
 
@@ -1457,8 +1558,17 @@ proof methods, especially the elimination part. However, we should
 keep in mind that existential reasoning is quite a powerful concept!
 I do not think there's too much incidental complexity involved here.
 
+**Exercise** : prove the following theorem.
 
 
+```clojure
+(defthm ex-impl
+  [[T :type] [P (==> T :type)] [Q (==> T :type)]]
+  (==> (exists [x T] (P x))
+       (forall [y T] (==> (P y) (Q y)))
+       (exists [x T] (Q x))))
+
+```
 
 ## Natural logic, in summary
 
@@ -1471,6 +1581,7 @@ They are introduced with `lambda` and eliminated with function application.
 - Logical equivalence is a conjunction of two implications, thus ultimately a conjunction. 
 - Disjunction (logical `or`) is also a derived principle. The rules are `or-intro-left`, `or-intro-right` and `or-elim`. The elimination rule implements the important principle of *proof by case*. For more than two cases, you may use `or*`, `or-intro*` and `or-elim*`.
 - Negation (logical `not`) is derived from absurdity, and from absurdity one can prove everything. This enables *proofs by contradiction* in LaTTe.
+- There is a simple yet effective encoding of existential quantification in type theory, with deduction rules `ex-intro` and `ex-elim`.
 ;;
 Now that we have a fairly complete logic, we will start to see how to do more traditional mathematics
 in LaTTe, starting with *set theory*.
